@@ -1,0 +1,84 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ws="https://schemas.elecho.dev/wpfsuite">
+
+    <!--  通用的 Expander 样式  -->
+    <Style x:Key="Expander.Base.Style" TargetType="{x:Type ws:Expander}">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HeaderPadding" Value="10" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Text.DeputyLevelColor}" />
+        <Setter Property="HeaderForeground" Value="{DynamicResource Text.ForegroundColor}" />
+        <Setter Property="HeaderHoverBackground" Value="{DynamicResource Control.HoverBackgroundColor}" />
+        <Setter Property="HeaderPressedBackground" Value="{DynamicResource Control.HoverBorderBrushColor}" />
+        <Setter Property="HeaderPressedForeground" Value="{DynamicResource Header.TextColor}" />
+        <Setter Property="HeaderCheckedForeground" Value="{DynamicResource Base.AccentColor}" />
+        <Setter Property="HeaderCornerRadius" Value="{Binding CornerRadius, RelativeSource={RelativeSource Mode=Self}}" />
+    </Style>
+
+    <!--  通用的 Label 样式  -->
+    <Style x:Key="Label.Base.Style" TargetType="{x:Type Label}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Control.BorderBrushColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text.ForegroundColor}" />
+    </Style>
+
+    <!--  通用的 ComboBox 样式  -->
+    <Style x:Key="ComboBox.Base.Style" TargetType="{x:Type ws:ComboBox}">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Control.BorderBrushColor}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Foreground" Value="{DynamicResource Text.ForegroundColor}" />
+        <Setter Property="HoverBorderBrush" Value="{DynamicResource Control.HoverBorderBrushColor}" />
+        <Setter Property="PopupBackground" Value="{DynamicResource Control.BackgroundColor}" />
+        <Setter Property="PressedBorderBrush" Value="{DynamicResource Control.PressedBorderBrushColor}" />
+    </Style>
+
+    <DataTemplate x:Key="ColorItemTemplate">
+        <StackPanel Orientation="Horizontal">
+            <Rectangle
+                Width="16"
+                Height="16"
+                Margin="0,0,5,0"
+                Fill="{Binding Color}" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!--  通用的 TextBox 样式  -->
+    <Style x:Key="TextBox.Base.Style" TargetType="{x:Type ws:TextBox}">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Margin" Value="0,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Control.BorderBrushColor}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Foreground" Value="{DynamicResource Text.ForegroundColor}" />
+        <Setter Property="HoverBorderBrush" Value="{DynamicResource Control.HoverBorderBrushColor}" />
+    </Style>
+
+    <!--  通用的 Button 样式  -->
+    <Style x:Key="Button.Base.Style" TargetType="{x:Type ws:Button}">
+        <Setter Property="Width" Value="60" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Control.BorderBrushColor}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Foreground" Value="{DynamicResource Text.ForegroundColor}" />
+        <Setter Property="HoverBackground" Value="{DynamicResource Control.HoverBackgroundColor}" />
+        <Setter Property="HoverBorderBrush" Value="{DynamicResource Control.HoverBorderBrushColor}" />
+        <Setter Property="PressedBackground" Value="{DynamicResource Control.PressedBackgroundColor}" />
+        <Setter Property="PressedBorderBrush" Value="{DynamicResource Control.PressedBorderBrushColor}" />
+    </Style>
+</ResourceDictionary>

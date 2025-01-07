@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UselessTool", "UselessTool\UselessTool.csproj", "{1163A9EE-68F1-4F2D-BDEC-4558D44F1C00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UselessTool.Theme", "UselessTool.Theme\UselessTool.Theme.csproj", "{4AED9D7E-1CDC-4D0A-B440-278D90758181}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UselessTool.Utilities", "UselessTool.Utilities\UselessTool.Utilities.csproj", "{624BFFB4-979C-460B-85AA-F38BC23A3448}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UselessTool.Control", "UselessTool.Control\UselessTool.Control.csproj", "{96E0EE57-1AE7-42E3-A584-8464BD17429A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "格式化配置", "格式化配置", "{4C6612EE-99BD-4A16-B006-94E0D34B7D85}"
+	ProjectSection(SolutionItems) = preProject
+		.csharpierrc.yaml = .csharpierrc.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1163A9EE-68F1-4F2D-BDEC-4558D44F1C00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1163A9EE-68F1-4F2D-BDEC-4558D44F1C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1163A9EE-68F1-4F2D-BDEC-4558D44F1C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1163A9EE-68F1-4F2D-BDEC-4558D44F1C00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AED9D7E-1CDC-4D0A-B440-278D90758181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AED9D7E-1CDC-4D0A-B440-278D90758181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AED9D7E-1CDC-4D0A-B440-278D90758181}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AED9D7E-1CDC-4D0A-B440-278D90758181}.Release|Any CPU.Build.0 = Release|Any CPU
+		{624BFFB4-979C-460B-85AA-F38BC23A3448}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{624BFFB4-979C-460B-85AA-F38BC23A3448}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{624BFFB4-979C-460B-85AA-F38BC23A3448}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{624BFFB4-979C-460B-85AA-F38BC23A3448}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96E0EE57-1AE7-42E3-A584-8464BD17429A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96E0EE57-1AE7-42E3-A584-8464BD17429A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96E0EE57-1AE7-42E3-A584-8464BD17429A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96E0EE57-1AE7-42E3-A584-8464BD17429A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

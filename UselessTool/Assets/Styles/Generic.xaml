@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Base.xaml" />
+        <ResourceDictionary Source="Default.xaml" />
+        <ResourceDictionary Source="ConstColors.xaml" />
+        <ResourceDictionary Source="ScrollViewer.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <FontFamily x:Key="IconFont">pack://application:,,,/UselessTool;component/Assets/Fonts/#Iconfont</FontFamily>
+</ResourceDictionary>

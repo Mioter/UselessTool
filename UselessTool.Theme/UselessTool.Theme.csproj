@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>UselessTool.Theme</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Page Update="Resources\Light\White.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Resources\Dark\Black.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Resources\Themes\Dark\Black.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Resources\Themes\Light\White.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Resources\Icons\" />
+      <Folder Include="Resources\Styles\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="EleCho.WpfSuite.Controls">
+        <HintPath>C:\Users\QAQ\.nuget\packages\elecho.wpfsuite.controls\0.9.15\lib\net8.0-windows7.0\EleCho.WpfSuite.Controls.dll</HintPath>
+      </Reference>
+      <Reference Include="EleCho.WpfSuite.Helpers">
+        <HintPath>C:\Users\QAQ\.nuget\packages\elecho.wpfsuite.helpers\0.9.1\lib\net8.0-windows7.0\EleCho.WpfSuite.Helpers.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

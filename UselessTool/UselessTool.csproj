@@ -1,0 +1,88 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CalcBinding6" Version="1.1.0" />
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+      <PackageReference Include="EleCho.WpfSuite" Version="0.9.15.1" />
+      <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="View\MainView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Assets\Styles\Default.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Styles\ConstColors.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\Buttons.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\Generic.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Assets\Styles\ConstColors.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Assets\Styles\Default.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Assets\Styles\Generic.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="View\UserControls\ThemeToggleView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\ConstColors.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\Buttons.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\Generic.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Assets\Styles\ConstColors.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Assets\Styles\Default.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Assets\Styles\Generic.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\UselessTool.Control\UselessTool.Control.csproj" />
+      <ProjectReference Include="..\UselessTool.Theme\UselessTool.Theme.csproj" />
+      <ProjectReference Include="..\UselessTool.Utilities\UselessTool.Utilities.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Assets\Fonts\Iconfont.ttf" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assets\Icon\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Assets\Fonts\Iconfont.ttf" />
+    </ItemGroup>
+
+</Project>
