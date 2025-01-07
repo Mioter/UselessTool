@@ -16,7 +16,7 @@
 - [Dynamic Theme ](https://github.com/jamesnetgroup/dynamic-theme)
 - [WPFUiBase](https://github.com/Gilfoylex/WPFUiBase)
 
-## 使用的库
+### 使用的库
 
 - [EleCho.WpfSuite](https://github.com/OrgEleCho/EleCho.WpfSuite "感谢 SlimeNull")
 - [CalcBinding](https://github.com/che77a38/CalcBinding)
