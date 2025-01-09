@@ -29,7 +29,7 @@ public static class TextBoxHelper
     {
         if (d is not FrameworkElement element) return;
         // 尝试找到父级 TextBox
-        TextBox? textBox = FindParent<TextBox>(element);
+        var textBox = FindParent<TextBox>(element);
 
         if (textBox == null) return;
         // 订阅或取消订阅 ClearButton 的 Click 事件
@@ -50,7 +50,7 @@ public static class TextBoxHelper
         if (sender is not Button clearButton) return;
         
         // 查找父级 TextBox 并清空内容
-        TextBox? textBox = FindParent<TextBox>(clearButton);
+        var textBox = FindParent<TextBox>(clearButton);
         textBox?.Clear();
     }
 
@@ -60,7 +60,7 @@ public static class TextBoxHelper
     {
         while (true)
         {
-            DependencyObject? parentObject = VisualTreeHelper.GetParent(child);
+            var parentObject = VisualTreeHelper.GetParent(child);
 
             switch (parentObject)
             {

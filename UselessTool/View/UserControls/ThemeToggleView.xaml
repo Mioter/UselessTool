@@ -6,8 +6,8 @@
     xmlns:common="clr-namespace:UselessTool.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ws="https://schemas.elecho.dev/wpfsuite"
     xmlns:theme="clr-namespace:UselessTool.Theme.Core;assembly=UselessTool.Theme"
+    xmlns:ws="https://schemas.elecho.dev/wpfsuite"
     d:DataContext="{d:DesignInstance Type=common:ThemeControl}"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -52,7 +52,6 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
-
     </UserControl.Resources>
     <Grid Width="250" MinHeight="100">
         <Border
@@ -81,7 +80,7 @@
                     <DataTemplate>
                         <StackPanel>
                             <StackPanel
-                                Margin="5"
+                                Margin="5,5,5,10"
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal">
                                 <Border

@@ -28,8 +28,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\Icons\" />
       <Folder Include="Resources\Styles\" />
+      <Folder Include="Resources\Icons\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -39,6 +39,10 @@
       <Reference Include="EleCho.WpfSuite.Helpers">
         <HintPath>C:\Users\QAQ\.nuget\packages\elecho.wpfsuite.helpers\0.9.1\lib\net8.0-windows7.0\EleCho.WpfSuite.Helpers.dll</HintPath>
       </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\UselessTool.Bases\UselessTool.Bases.csproj" />
     </ItemGroup>
 
 </Project>

@@ -51,8 +51,8 @@ public class MathConverter : IValueConverter
     // 计算数学表达式的值
     private static double EvaluateExpression(string expression)
     {
-        Stack<double>? values = new(); // 存储数值
-        Stack<char>? operators = new(); // 存储操作符
+        Stack<double> values = new(); // 存储数值
+        Stack<char> operators = new(); // 存储操作符
 
         for (int i = 0; i < expression.Length; i++)
         {
@@ -105,7 +105,7 @@ public class MathConverter : IValueConverter
     // 提取数字
     private static string ExtractNumber(string expression, ref int index)
     {
-        StringBuilder? numStr = new();
+        StringBuilder numStr = new();
         while (index < expression.Length && (char.IsDigit(expression[index]) || expression[index] == '.'))
         {
             numStr.Append(expression[index++]);

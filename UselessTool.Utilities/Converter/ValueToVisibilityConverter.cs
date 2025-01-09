@@ -16,7 +16,7 @@ public class ValueToVisibilityConverter : IValueConverter
         if (parameter is not string parameterString)
             return GetDefaultVisibility(GetBooleanValue(value));
 
-        (bool UseCollapsed, bool InvertValue) settings = ParseParameter(parameterString);
+        var settings = ParseParameter(parameterString);
         bool isVisible = EvaluateValueAndParameter(value, parameterString, settings);
 
         return GetVisibility(isVisible, settings);

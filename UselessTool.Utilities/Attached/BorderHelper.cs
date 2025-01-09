@@ -59,7 +59,7 @@ public class BorderHelper
 
     private static void OnAutoCornerRadiusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        Border? border = d as Border;
+        var border = d as Border;
         bool newValue = (bool)e.NewValue;
         if (border == null) return;
         

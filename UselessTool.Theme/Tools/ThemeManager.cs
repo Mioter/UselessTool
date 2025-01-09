@@ -4,23 +4,25 @@ namespace UselessTool.Theme.Tools;
 
 public class ThemeManager
 {
-    public Dictionary<
+    internal Dictionary<
         ThemeResourceType,
         Dictionary<string, Dictionary<string, ResourceDictionary>>
-    > Resources
+    > ThemeResources
     { get; } = [];
 
-    public Dictionary<ThemeResourceType, ThemeInfo> CurrentThemes { get; } = [];
+    private Dictionary<ThemeResourceType, ThemeInfo> CurrentThemesInfo { get; } = [];
 
     public event EventHandler<ThemeChangingEventArgs>? ThemeChanging; // 定义主题更改前事件
     public event EventHandler<ThemeChangedEventArgs>? ThemeChanged; // 定义主题更改后事件
 
+    private const string CurrentAssemblyName = "UselessTool.Theme";
+
     public ThemeManager()
     {
-        foreach (ThemeResourceType resourceType in Enum.GetValues<ThemeResourceType>())
+        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
         {
-            Resources[resourceType] = [];
-            CurrentThemes[resourceType] = new ThemeInfo("", "");
+            ThemeResources[resourceType] = [];
+            CurrentThemesInfo[resourceType] = new ThemeInfo();
         }
     }
 
@@ -40,7 +42,13 @@ public class ThemeManager
     {
         EnsureResourceTypeExists(resourceType);
         EnsureThemeTypeExists(resourceType, themeType);
-        Resources[resourceType][themeType][themeName] = resourceDict;
+        ThemeResources[resourceType][themeType][themeName] = resourceDict;
+
+        // 如果主题正在使用，则立即应用以更新
+        if (CurrentThemesInfo.TryGetValue(resourceType, out var value) && value.ThemeType == themeType && value.ThemeName == themeName)
+        {
+            ApplyTheme(resourceType, themeType, themeName);
+        }
     }
 
     /// <summary>
@@ -49,16 +57,26 @@ public class ThemeManager
     /// <param name="resourceType">资源类型</param>
     /// <param name="themeType">主题类型（例如：亮色主题、暗色主题）</param>
     /// <param name="themeName">主题名称</param>
-    /// <param name="assemblyName">程序集</param>
+    /// <param name="assemblyName">程序集，默认为当前程序集</param>
     /// <param name="resourcePath">程序集中的资源字典所在路径（相对路径）</param>
     public void RegisterAndUpdateTheme(
         ThemeResourceType resourceType,
         string themeType,
         string themeName,
-        string assemblyName,
-        string resourcePath
+        string? assemblyName = null,
+        string resourcePath = ""
     )
     {
+        if (string.IsNullOrEmpty(assemblyName))
+        {
+            assemblyName = CurrentAssemblyName;
+        }
+
+        if (string.IsNullOrEmpty(resourcePath))
+        {
+            resourcePath = $"Resources/{resourceType}/{themeType}/{themeName}.xaml";
+        }
+
         string uri = $"/{assemblyName};component/{resourcePath}";
         RegisterAndUpdateTheme(
             resourceType,
@@ -76,29 +94,28 @@ public class ThemeManager
     /// <param name="themeName">主题名称</param>
     internal void ApplyTheme(ThemeResourceType resourceType, string themeType, string themeName)
     {
-        ThemeInfo themeInfo = new(themeType, themeName);
+        var newTheme = GetSpecifiedTheme(resourceType, themeType, themeName);
 
-        if (CurrentThemes[resourceType].Equals(themeInfo))
+        if (Application.Current.Resources.MergedDictionaries.Contains(newTheme))
             return; // 如果当前主题与要应用的主题一致，则不应用
 
-        ThemeChangingEventArgs? changingArgs = new(
+        ThemeChangingEventArgs changingArgs = new(
             resourceType,
             themeType,
             themeName,
-            GetTheme(resourceType, themeType, themeName)
+            newTheme
         );
+
         OnThemeChanging(changingArgs); // 触发主题更改前事件
         if (changingArgs.Cancel) // 如果取消事件，则不应用新主题
             return;
 
-        ResourceDictionary? theme = GetTheme(resourceType, themeType, themeName);
+        RemoveAllAppliedThemes();
+        Application.Current.Resources.MergedDictionaries.Add(newTheme);
 
-        RemoveAllThemes();
-        Application.Current.Resources.MergedDictionaries.Add(theme);
+        OnThemeChanged(new ThemeChangedEventArgs(resourceType, themeType, themeName, newTheme)); // 触发主题更改事件
 
-        OnThemeChanged(new ThemeChangedEventArgs(resourceType, themeType, themeName, theme)); // 触发主题更改事件
-
-        CurrentThemes[resourceType] = themeInfo;
+        CurrentThemesInfo[resourceType] = new ThemeInfo(themeType, themeName);
     }
 
     /// <summary>
@@ -114,12 +131,7 @@ public class ThemeManager
         EnsureResourceTypeExists(resourceType);
         EnsureThemeTypeExists(resourceType, themeType);
 
-        if (Resources[resourceType][themeType].Count <= 1)
-        {
-            throw new InvalidOperationException($"不能移除{themeType}类型的唯一主题。");
-        }
-
-        Resources[resourceType][themeType].Remove(themeName);
+        ThemeResources[resourceType][themeType].Remove(themeName);
     }
 
     /// <summary>
@@ -142,51 +154,68 @@ public class ThemeManager
         EnsureThemeTypeExists(resourceType, oldThemeType);
         EnsureThemeTypeExists(resourceType, newThemeType);
 
-        ResourceDictionary? resourceDict = Resources[resourceType][oldThemeType][oldThemeName];
-        Resources[resourceType][oldThemeType].Remove(oldThemeName);
+        var resourceDict = ThemeResources[resourceType][oldThemeType][oldThemeName];
+        ThemeResources[resourceType][oldThemeType].Remove(oldThemeName);
 
-        Resources[resourceType][newThemeType][newThemeName] = resourceDict;
+        ThemeResources[resourceType][newThemeType][newThemeName] = resourceDict;
 
         // 如果当前主题已重命名，则更新当前主题信息
-        if (CurrentThemes[resourceType].Equals(new ThemeInfo(oldThemeType, oldThemeName)))
+        if (CurrentThemesInfo[resourceType].Equals(new ThemeInfo(oldThemeType, oldThemeName)))
         {
-            CurrentThemes[resourceType] = new ThemeInfo(newThemeType, newThemeName);
+            CurrentThemesInfo[resourceType] = new ThemeInfo(newThemeType, newThemeName);
         }
     }
 
     /// <summary>
-    /// 获取上一次应用的主题类型和主题名称
+    /// 获取当前应用的主题类型和主题名称
     /// </summary>
     /// <param name="resourceType">资源类型</param>
     /// <returns>包含主题类型和主题名称的元组</returns>
     public (string themeType, string themeName) GetCurrentThemeInfo(ThemeResourceType resourceType)
     {
-        return (CurrentThemes[resourceType].ThemeType, CurrentThemes[resourceType].ThemeName);
+        return (CurrentThemesInfo[resourceType].ThemeType, CurrentThemesInfo[resourceType].ThemeName);
     }
 
     /// <summary>
-    /// 获取当前的主题
+    /// 获取当前应用的主题资源字典
     /// </summary>
     /// <param name="resourceType">资源类型</param>
     /// <returns>资源字典</returns>
     public ResourceDictionary GetCurrentTheme(ThemeResourceType resourceType)
     {
-        return GetTheme(resourceType, CurrentThemes[resourceType].ThemeType, CurrentThemes[resourceType].ThemeName);
+        return GetSpecifiedTheme(
+            resourceType,
+            CurrentThemesInfo[resourceType].ThemeType,
+            CurrentThemesInfo[resourceType].ThemeName
+        );
     }
 
     /// <summary>
-    /// 获取指定的主题
+    /// 获取指定资源类型的主题字典
+    /// </summary>
+    /// <param name="resourceType">资源类型</param>
+    /// <returns>主题字典 结构：主题类型>主题名>资源字典</returns>
+    public Dictionary<string, Dictionary<string, ResourceDictionary>> GetThemeDictionary(ThemeResourceType resourceType)
+    {
+        return ThemeResources[resourceType];
+    }
+
+    /// <summary>
+    /// 获取指定的主题资源字典
     /// </summary>
     /// <param name="resourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
     /// <returns>资源字典</returns>
-    private ResourceDictionary GetTheme(ThemeResourceType resourceType, string themeType, string themeName)
+    public ResourceDictionary GetSpecifiedTheme(ThemeResourceType resourceType, string themeType, string themeName)
     {
         return
-            !Resources.TryGetValue(resourceType, out Dictionary<string, Dictionary<string, ResourceDictionary>>? themesByType)
+            !ThemeResources.TryGetValue(
+                resourceType,
+                out var themesByType
+            )
             || !themesByType.TryGetValue(themeType, out Dictionary<string, ResourceDictionary>? themes)
-            || !themes.TryGetValue(themeName, out ResourceDictionary? theme)
+            || !themes.TryGetValue(themeName, out var theme)
             ? throw new ArgumentException("主题未注册。")
             : theme;
     }
@@ -200,7 +229,10 @@ public class ThemeManager
     /// <returns></returns>
     public bool IsThemeRegistered(ThemeResourceType resourceType, string themeType, string themeName)
     {
-        return Resources.TryGetValue(resourceType, out Dictionary<string, Dictionary<string, ResourceDictionary>>? themesByType)
+        return ThemeResources.TryGetValue(
+                resourceType,
+                out var themesByType
+            )
             && themesByType.TryGetValue(themeType, out Dictionary<string, ResourceDictionary>? themes)
             && themes.ContainsKey(themeName);
     }
@@ -209,11 +241,11 @@ public class ThemeManager
     /// 确保资源类型存在。 如果不存在，则创建一个空的主题类型集合
     /// </summary>
     /// <param name="resourceType">资源类型</param>
-    private void EnsureResourceTypeExists(ThemeResourceType resourceType)
+    internal void EnsureResourceTypeExists(ThemeResourceType resourceType)
     {
-        if (!Resources.ContainsKey(resourceType))
+        if (!ThemeResources.ContainsKey(resourceType))
         {
-            Resources[resourceType] = [];
+            ThemeResources[resourceType] = [];
         }
     }
 
@@ -225,24 +257,35 @@ public class ThemeManager
     internal void EnsureThemeTypeExists(ThemeResourceType resourceType, string themeType)
     {
         EnsureResourceTypeExists(resourceType);
-        if (!Resources[resourceType].ContainsKey(themeType))
+        if (!ThemeResources[resourceType].ContainsKey(themeType))
         {
-            Resources[resourceType][themeType] = [];
+            ThemeResources[resourceType][themeType] = [];
         }
     }
 
     /// <summary>
     /// 移除所有已应用的主题
     /// </summary>
-    private void RemoveAllThemes()
+    internal void RemoveAllAppliedThemes()
     {
         foreach (
-            ResourceDictionary? theme in Resources
+            var theme in ThemeResources
                 .Values.SelectMany(themesByType => themesByType.Values)
                 .SelectMany(themes => themes.Values)
         )
         {
             Application.Current.Resources.MergedDictionaries.Remove(theme);
+        }
+    }
+
+    /// <summary>
+    /// 清空 CurrentThemesInfo 中所有 ThemeInfo 结构体的值
+    /// </summary>
+    internal void ClearCurrentThemesInfo()
+    {
+        foreach (var resourceType in CurrentThemesInfo.Keys.ToList())
+        {
+            CurrentThemesInfo[resourceType] = new ThemeInfo();
         }
     }
 

@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -72,13 +71,13 @@ public class ThemeProps
     private static void AnimateBrushProperty(FrameworkElement element, SolidColorBrush newBrush, DependencyProperty dp)
     {
         string? propertyName = dp.Name;
-        PropertyInfo? propertyInfo = element.GetType().GetProperty(propertyName);
+        var propertyInfo = element.GetType().GetProperty(propertyName);
 
         if (propertyInfo == null)
             return;
 
         // 获取当前刷子，如果为空或冻结则创建一个新的刷子
-        SolidColorBrush? currentValue = propertyInfo.GetValue(element) as SolidColorBrush ?? new SolidColorBrush(newBrush.Color);
+        var currentValue = propertyInfo.GetValue(element) as SolidColorBrush ?? new SolidColorBrush(newBrush.Color);
         if (currentValue.IsFrozen)
         {
             currentValue = new SolidColorBrush(currentValue.Color);
@@ -87,7 +86,7 @@ public class ThemeProps
         // 设置新的刷子
         propertyInfo.SetValue(element, currentValue);
 
-        ColorAnimation? animation = new()
+        ColorAnimation animation = new()
         {
             To = newBrush.Color,
             Duration = TimeSpan.FromSeconds(0.3),

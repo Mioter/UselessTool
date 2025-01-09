@@ -11,8 +11,7 @@
     <ItemGroup>
       <PackageReference Include="CalcBinding6" Version="1.1.0" />
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-      <PackageReference Include="EleCho.WpfSuite" Version="0.9.15.1" />
-      <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+      <PackageReference Include="EleCho.WpfSuite" Version="0.9.16" />
     </ItemGroup>
 
     <ItemGroup>
@@ -68,6 +67,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\UselessTool.Amusing\UselessTool.Amusing.csproj" />
       <ProjectReference Include="..\UselessTool.Control\UselessTool.Control.csproj" />
       <ProjectReference Include="..\UselessTool.Theme\UselessTool.Theme.csproj" />
       <ProjectReference Include="..\UselessTool.Utilities\UselessTool.Utilities.csproj" />
@@ -78,11 +78,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Assets\Icon\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Resource Include="Assets\Fonts\Iconfont.ttf" />
+      <Resource Include="Assets\Fonts\IconFont.ttf" />
     </ItemGroup>
 
 </Project>

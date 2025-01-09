@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "格式化配置", "格式�
 		.csharpierrc.yaml = .csharpierrc.yaml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UselessTool.Bases", "UselessTool.Bases\UselessTool.Bases.csproj", "{212EF332-6329-4DB9-AC8A-2381F0CEAE92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UselessTool.Amusing", "UselessTool.Amusing\UselessTool.Amusing.csproj", "{4DC2A99A-2002-4D93-BD77-512AFA83ABBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +42,14 @@ Global
 		{96E0EE57-1AE7-42E3-A584-8464BD17429A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96E0EE57-1AE7-42E3-A584-8464BD17429A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96E0EE57-1AE7-42E3-A584-8464BD17429A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{212EF332-6329-4DB9-AC8A-2381F0CEAE92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{212EF332-6329-4DB9-AC8A-2381F0CEAE92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{212EF332-6329-4DB9-AC8A-2381F0CEAE92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{212EF332-6329-4DB9-AC8A-2381F0CEAE92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DC2A99A-2002-4D93-BD77-512AFA83ABBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DC2A99A-2002-4D93-BD77-512AFA83ABBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DC2A99A-2002-4D93-BD77-512AFA83ABBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DC2A99A-2002-4D93-BD77-512AFA83ABBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

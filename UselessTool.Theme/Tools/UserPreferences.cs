@@ -1,12 +1,12 @@
 using System.IO;
 using System.Text.Json;
-using static UselessTool.Theme.Tools.FileSystemHelper;
+using static UselessTool.Bases.SystemIO.FileSystemHelper;
 
 namespace UselessTool.Theme.Tools;
 
 public class UserPreferences(string filePath)
 {
-    private readonly string _filePath = Path.Combine(filePath, "UserPreferences.json");
+    private readonly string _filePath = Path.Combine(filePath, "userPreferences.json");
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = true };
 
     /// <summary>
@@ -28,8 +28,8 @@ public class UserPreferences(string filePath)
                 return CreateDefaultPreferences();
             }
 
-            using JsonDocument? doc = JsonDocument.Parse(jsonContent);
-            JsonElement root = doc.RootElement;
+            using var doc = JsonDocument.Parse(jsonContent);
+            var root = doc.RootElement;
 
             return root.ValueKind != JsonValueKind.Object
                 ? throw new InvalidDataException("JSON 文件格式不正确。根元素应为对象。")
@@ -60,20 +60,20 @@ public class UserPreferences(string filePath)
     /// <exception cref="InvalidOperationException">如果 JSON 结构不正确</exception>
     private static Dictionary<ThemeResourceType, Dictionary<string, string>> DeserializePreferences(JsonElement root)
     {
-        Dictionary<ThemeResourceType, Dictionary<string, string>>? preferences = new();
+        Dictionary<ThemeResourceType, Dictionary<string, string>> preferences = [];
 
-        foreach (JsonProperty property in root.EnumerateObject())
+        foreach (var property in root.EnumerateObject())
         {
             if (Enum.TryParse(property.Name, out ThemeResourceType resourceType))
             {
-                Dictionary<string, string>? resourcePreferences = new();
+                Dictionary<string, string> resourcePreferences = [];
 
                 if (property.Value.ValueKind != JsonValueKind.Object)
                 {
                     throw new InvalidOperationException($"属性值必须是一个对象。属性名: {property.Name}");
                 }
 
-                foreach (JsonProperty preferenceProperty in property.Value.EnumerateObject())
+                foreach (var preferenceProperty in property.Value.EnumerateObject())
                 {
                     resourcePreferences[preferenceProperty.Name] =
                         preferenceProperty.Value.GetString() ?? throw new InvalidOperationException("属性值不能为空。");
@@ -98,7 +98,7 @@ public class UserPreferences(string filePath)
     private static Dictionary<ThemeResourceType, Dictionary<string, string>> CreateDefaultPreferences()
     {
         Dictionary<ThemeResourceType, Dictionary<string, string>> preferences = [];
-        foreach (ThemeResourceType resourceType in Enum.GetValues<ThemeResourceType>())
+        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
         {
             preferences[resourceType] = [];
         }

@@ -51,7 +51,7 @@ public class PopupEx : Popup
     {
         if (sender is not Popup popup || popup.Child == null) return;
 
-        Window? window = FindParentWindow(popup);
+        var window = FindParentWindow(popup);
         if (window == null) return;
 
         UnsubscribeFromWindowEvents(window);
@@ -80,7 +80,7 @@ public class PopupEx : Popup
     {
         try
         {
-            MethodInfo? updateMethod = typeof(Popup).GetMethod("UpdatePosition", BindingFlags.NonPublic | BindingFlags.Instance);
+            var updateMethod = typeof(Popup).GetMethod("UpdatePosition", BindingFlags.NonPublic | BindingFlags.Instance);
             if (updateMethod != null && IsOpen)
             {
                 updateMethod.Invoke(this, null);
@@ -131,7 +131,7 @@ public class PopupEx : Popup
         if (Child == null) return;
 
         IntPtr hwnd = ((HwndSource)PresentationSource.FromVisual(Child)).Handle;
-        if (hwnd == IntPtr.Zero || !NativeMethods.GetWindowRect(hwnd, out Rect rect)) return;
+        if (hwnd == IntPtr.Zero || !NativeMethods.GetWindowRect(hwnd, out var rect)) return;
         int result = NativeMethods.SetWindowPos(
             hwnd,
             Topmost ? -1 : -2,
@@ -150,7 +150,7 @@ public class PopupEx : Popup
 
     private static Window? FindParentWindow(Popup popup)
     {
-        DependencyObject? parent = VisualTreeHelper.GetParent(popup);
+        var parent = VisualTreeHelper.GetParent(popup);
         while (parent != null && !(parent is Window))
         {
             parent = VisualTreeHelper.GetParent(parent);
