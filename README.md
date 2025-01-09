@@ -4,9 +4,9 @@
 
 ### 实现原理
 
-受到[Dynamic Theme ](https://github.com/jamesnetgroup/dynamic-theme)项目的启发，基于此项目进行了扩展。
-通过构建资源字典保存在本地的方式实现可增添/移除的主题管理。
-基于此特性，所有资源字典中的类型受到支持~~也许吧~~，以达到在运行中动态的切换。
+受到[Dynamic Theme ](https://github.com/jamesnetgroup/dynamic-theme)项目的启发，基于此项目进行了扩展。<br>
+通过构建资源字典保存在本地的方式实现可增添/移除的主题管理。<br>
+基于此特性，~~所有资源字典中的类型受到支持~~，以达到在运行中动态的切换。
 
 ## 
 
