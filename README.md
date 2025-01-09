@@ -10,6 +10,7 @@
 
 ### 效果展示
 
+*图片比较大可能需要加载一会儿~*
 ![已实现的功能效果展示](https://github.com/Mioter/UselessTool/blob/Mioter/%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA.gif)
 
 ## 
