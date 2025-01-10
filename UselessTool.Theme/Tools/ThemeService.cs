@@ -159,15 +159,26 @@ public class ThemeService
         try
         {
             (string themeType, string themeName) = _themeManager.GetCurrentThemeInfo(themeResourceType);
-            var preferences = _userPreferences.LoadUserPreferences();
-            preferences[themeResourceType][themeType] = themeName;
-            preferences[themeResourceType]["PreferenceThemeType"] = themeType;
-            _userPreferences.SaveUserPreferences(preferences);
+            SaveThemeAsPreference(themeResourceType, themeType, themeName);
         }
         catch
         {
             throw; // TODO 处理异常
         }
+    }
+
+    /// <summary>
+    /// 保存主题位用户偏好
+    /// </summary>
+    /// <param name="themeResourceType">资源类型</param>
+    /// <param name="themeType">主题类型</param>
+    /// <param name="themeName">主题名称</param>
+    private void SaveThemeAsPreference(ThemeResourceType themeResourceType, string themeType, string themeName)
+    {
+        var preferences = _userPreferences.LoadUserPreferences();
+        preferences[themeResourceType][themeType] = themeName;
+        preferences[themeResourceType]["PreferenceThemeType"] = themeType;
+        _userPreferences.SaveUserPreferences(preferences);
     }
 
     /// <summary>
@@ -216,10 +227,10 @@ public class ThemeService
     )
     {
         string? preferredThemeName = GetPreferredThemeName(themeResourceType, themeType);
-        if (preferredThemeName != null)
-        {
+        if (preferredThemeName is null)
+            TryApplyTheme(themeResourceType, themeType, _themeManager.GetFirstThemeName(themeResourceType, themeType));
+        else
             TryApplyTheme(themeResourceType, themeType, preferredThemeName, isChangePreference);
-        }
     }
 
     /// <summary>
@@ -274,11 +285,19 @@ public class ThemeService
         string themeName
     )
     {
+        if (GetPreferredThemeName(themeResourceType, themeType) == themeName)
+        {
+            SaveThemeAsPreference(
+                themeResourceType,
+                themeType,
+                _themeManager.GetFirstThemeName(themeResourceType, themeType)
+            );
+        }
+
         string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
         if (File.Exists(filePath))
-        {
             File.Delete(filePath);
-        }
+
         _themeManager.RemoveTheme(themeResourceType, themeType, themeName);
     }
 
@@ -298,7 +317,7 @@ public class ThemeService
     {
         string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
         EnsureFileExists(Path.GetDirectoryName(filePath)!);
-        newResourceDict ??= _themeManager.GetSpecifiedTheme(themeResourceType, themeType, themeName);
+        newResourceDict ??= _themeManager.GetThemeResourceDictionary(themeResourceType, themeType, themeName);
         Save(newResourceDict, filePath);
         _themeManager.RegisterAndUpdateTheme(themeResourceType, themeType, themeName, newResourceDict);
     }
@@ -330,9 +349,7 @@ public class ThemeService
             );
             _themeManager.RenameTheme(themeResourceType, oldThemeType, oldThemeName, finalThemeType, finalThemeName);
             if (oldThemeType != finalThemeType)
-            {
                 MoveThemeFileOnDisk(themeResourceType, oldThemeType, oldThemeName, finalThemeType, finalThemeName);
-            }
         }
         catch (InvalidOperationException ex)
         {

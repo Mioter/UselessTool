@@ -281,7 +281,7 @@ public partial class ThemeControl : ObservableObject
     {
         ThemeItems.Clear(); // 清空现有主题项
 
-        var themes = ThemeManager.GetThemeDictionary(ThemeResourceType.Colors);
+        var themes = ThemeManager.GetThemeResourceTypeDictionary(ThemeResourceType.Colors);
         var userPreferences = ThemeService.GetUserPreferences(ThemeResourceType.Colors);
 
         foreach (string themeType in themes.Keys)
