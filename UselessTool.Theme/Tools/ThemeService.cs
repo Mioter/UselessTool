@@ -235,7 +235,7 @@ public class ThemeService
     )
     {
         string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
-        EnsureFileExists(Path.GetDirectoryName(filePath)!);
+        EnsureDirectoryExists(Path.GetDirectoryName(filePath)!);
         Save(resourceDict, filePath);
         _themeManager.RegisterAndUpdateTheme(themeResourceType, themeType, themeName, resourceDict);
     }
