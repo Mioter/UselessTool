@@ -10,9 +10,7 @@
 
 ### ✨ 效果展示
 
-*图片较大，可能加载缓慢~*
-
-![已实现的功能效果展示](https://github.com/Mioter/UselessTool/blob/Mioter/%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA.gif)
+*没有展示，自己看过~*
 
 ### ⚠️ 注意
 
