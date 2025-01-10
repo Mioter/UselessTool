@@ -83,7 +83,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            TipsText = AddRandomEmoticon($"{ex.Message}+_+", EmotionType.Angry, AdditionalRules.Tsundere);
+            TipsText = AddRandomEmoticon($"{ex.Message}", EmotionType.Angry, AdditionalRules.Tsundere);
         }
     }
 
