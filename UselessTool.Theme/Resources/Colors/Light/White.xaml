@@ -4,57 +4,51 @@
 
     <!--  基础颜色  -->
     <SolidColorBrush x:Key="Base.BackgroundColor" Color="#FFFFFFFF" />
-    <!--  白色  -->
-    <SolidColorBrush x:Key="Base.ForegroundColor" Color="#FF424242" />
-    <!--  深灰色  -->
-    <SolidColorBrush x:Key="Base.AccentColor" Color="#FF1E88E5" />
-    <!--  蓝色  -->
 
+    <SolidColorBrush x:Key="Base.ForegroundColor" Color="#FF424242" />
+
+    <SolidColorBrush x:Key="Base.AccentColor" Color="#FF1E88E5" />
+    
     <!--  控件背景色  -->
     <SolidColorBrush x:Key="Control.BackgroundColor" Color="#FFFFFFFF" />
-    <!--  默认白色背景，适用于按钮、文本框等  -->
+
     <SolidColorBrush x:Key="Control.HoverBackgroundColor" Color="#FFE0E0E0" />
-    <!--  鼠标悬停时的浅灰色背景  -->
+
     <SolidColorBrush x:Key="Control.PressedBackgroundColor" Color="#FFD0D0D0" />
-    <!--  按下时的深灰色背景  -->
 
     <!--  控件边框色  -->
     <SolidColorBrush x:Key="Control.BorderBrushColor" Color="#FF6bA4F9" />
+    
     <SolidColorBrush x:Key="Control.HoverBorderBrushColor" Color="#FF3E92F9" />
-    <!--  悬停时的更深灰色边框  -->
+
     <SolidColorBrush x:Key="Control.PressedBorderBrushColor" Color="#FF1468F9" />
-    <!--  按下时的更深灰色边框  -->
 
     <!--  文本颜色  -->
     <SolidColorBrush x:Key="Text.ForegroundColor" Color="#FF000000" />
-    <!--  黑色文本，适用于标签、按钮文本等  -->
+
     <SolidColorBrush x:Key="Text.DeputyLevelColor" Color="#FF5E5E5E" />
-    <!--  深灰色文本，用于次级内容文本等  -->
+
     <SolidColorBrush x:Key="Text.PlaceholderColor" Color="#FF808080" />
-    <!--  灰色占位符文本，适用于文本框  -->
 
     <!--  边框和分隔线颜色  -->
     <SolidColorBrush x:Key="Border.Color" Color="#FFCCCCCC" />
-    <!--  默认浅灰色边框  -->
-    <SolidColorBrush x:Key="Border.AccentColor" Color="#FF1E88E5" />
-    <!--  蓝色强调边框  -->
-    <SolidColorBrush x:Key="Separator.Color" Color="#FFE0E0E0" />
-    <!--  浅灰色分隔线  -->
 
+    <SolidColorBrush x:Key="Border.AccentColor" Color="#FF1E88E5" />
+
+    <SolidColorBrush x:Key="Separator.Color" Color="#FFE0E0E0" />
+    
     <!--  交互元素颜色  -->
     <SolidColorBrush x:Key="Hyperlink.Color" Color="#FF1E88E5" />
-    <!--  蓝色超链接文本  -->
+
     <SolidColorBrush x:Key="Hyperlink.VisitedColor" Color="#FF9C27B0" />
-    <!--  紫色已访问超链接文本  -->
 
     <!--  其他UI元素颜色  -->
     <SolidColorBrush x:Key="Header.BackgroundColor" Color="#FF1E88E5" />
-    <!--  蓝色头部背景  -->
+ 
     <SolidColorBrush x:Key="Header.TextColor" Color="#FFFFFFFF" />
-    <!--  白色头部文本  -->
+
     <SolidColorBrush x:Key="Footer.BackgroundColor" Color="#FFE0E0E0" />
-    <!--  浅灰色页脚背景，与表单页脚共享颜色  -->
+
     <SolidColorBrush x:Key="Footer.TextColor" Color="#FF000000" />
-    <!--  黑色页脚文本，与文本前景色共享颜色  -->
 
 </ResourceDictionary>
