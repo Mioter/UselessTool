@@ -32,11 +32,7 @@ public partial class App : Application
     private static void DetectTheme()
     {
         IsSystemInDarkMode = !IsLightTheme();
-        ThemeControl.GetInstance.FollowSystemToggleLightOrDarkTheme(
-            IsSystemInDarkMode
-                ? ThemeControl.ThemeTypeDic[ColorsThemeType.Dark]
-                : ThemeControl.ThemeTypeDic[ColorsThemeType.Light]
-        );
+        ThemeControl.GetInstance.FollowSystemToggleLightOrDarkTheme();
     }
 
     private static bool IsLightTheme()

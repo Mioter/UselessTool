@@ -59,7 +59,8 @@ public partial class ThemeControl : ObservableObject
         if (e.ResourceType != ThemeResourceType.Colors)
             return;
 
-        CurrentThemeResourceDictionary = e.NewTheme; // 更新当前颜色主题字典
+        CurrentColorsThemeResourceDictionary = e.NewTheme; // 更新当前颜色主题字典
+        CurrentColorsThemeInfo = (e.ThemeType, e.ThemeName);
         SetIsNightChecked(e.ThemeType);
     }
 
@@ -73,7 +74,10 @@ public partial class ThemeControl : ObservableObject
 
     public static Dictionary<ColorsThemeType, string> ThemeTypeDic { get; private set; } =
         new() { { ColorsThemeType.Light, "Light" }, { ColorsThemeType.Dark, "Dark" } };
-    public static ResourceDictionary CurrentThemeResourceDictionary { get; private set; } = [];
+    public static ResourceDictionary CurrentColorsThemeResourceDictionary { get; private set; } = [];
+
+    public static (string themeType, string themeName) CurrentColorsThemeInfo { get; private set; }
+
     private JsonConfig<Dictionary<string, bool>> OtherJsonConfig { get; set; } =
         new JsonConfig<Dictionary<string, bool>>(ThemePath, "other_config.json");
     public ThemeManager ThemeManager { get; }
@@ -144,6 +148,7 @@ public partial class ThemeControl : ObservableObject
     private void ToggleDayModeNightMode()
     {
         IsNightChecked = !IsNightChecked;
+        IsFollowSystemDarkMode = false;
         ThemeService.SwitchToPreferredTheme(
             ThemeResourceType.Colors,
             IsNightChecked ? ThemeTypeDic[ColorsThemeType.Dark] : ThemeTypeDic[ColorsThemeType.Light]
@@ -167,8 +172,11 @@ public partial class ThemeControl : ObservableObject
     [RelayCommand]
     private void UpdateTheme()
     {
-        (string themeType, string themeName) = ThemeManager.GetCurrentThemeInfo(ThemeResourceType.Colors);
-        ThemeService.UpdateThemeAndSaveToFileSystem(ThemeResourceType.Colors, themeType, themeName);
+        ThemeService.UpdateThemeAndSaveToFileSystem(
+            ThemeResourceType.Colors,
+            CurrentColorsThemeInfo.themeType,
+            CurrentColorsThemeInfo.themeName
+        );
     }
 
     /// <summary>
@@ -179,12 +187,15 @@ public partial class ThemeControl : ObservableObject
     {
         try
         {
-            (string themeType, string themeName) = ThemeManager.GetCurrentThemeInfo(ThemeResourceType.Colors);
-            ThemeService.ReloadThemeFromFileSystem(ThemeResourceType.Colors, themeType, themeName);
+            ThemeService.ReloadThemeFromFileSystem(
+                ThemeResourceType.Colors,
+                CurrentColorsThemeInfo.themeType,
+                CurrentColorsThemeInfo.themeName
+            );
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"{ex.Message}\n" + "请注意默认主题不支持重载。如有需要将将他们移步至对应文件夹。");
+            MessageBox.Show($"{ex.Message}\n");
         }
     }
 
@@ -235,7 +246,10 @@ public partial class ThemeControl : ObservableObject
     {
         try
         {
-            var otherConfig = OtherJsonConfig.LoadFromJson();
+            var otherConfig =
+                OtherJsonConfig.LoadFromJson()
+                ?? new Dictionary<string, bool>() { { "IsFollowSystemDarkMode", false } };
+            IsFollowSystemDarkMode = otherConfig["IsFollowSystemDarkMode"];
         }
         catch
         {
@@ -253,7 +267,11 @@ public partial class ThemeControl : ObservableObject
         ThemeManager.RegisterAndUpdateTheme(ThemeResourceType.Colors, "Dark", "Black");
 
         ThemeService.LoadThemesFromFileSystem();
-        ThemeService.ApplyPreferredTheme(ThemeResourceType.Colors);
+
+        if (IsFollowSystemDarkMode)
+            FollowSystemToggleLightOrDarkTheme();
+        else
+            ThemeService.ApplyPreferredTheme(ThemeResourceType.Colors);
     }
 
     /// <summary>
@@ -298,7 +316,6 @@ public partial class ThemeControl : ObservableObject
     private void SetIsNightChecked(string themeType)
     {
         IsNightChecked = ThemeTypeDic[ColorsThemeType.Dark] == themeType;
-        IsFollowSystemDarkMode = false;
     }
 
     /// <summary>
@@ -343,15 +360,17 @@ public partial class ThemeControl : ObservableObject
     /// 跟随系统切换浅色/深色主题。
     /// </summary>
     /// <param name="themeType"></param>
-    public void FollowSystemToggleLightOrDarkTheme(string themeType)
+    public void FollowSystemToggleLightOrDarkTheme()
     {
-        if (!IsFollowSystemDarkMode)
+        var themeType = App.IsSystemInDarkMode
+            ? ThemeTypeDic[ColorsThemeType.Dark]
+            : ThemeTypeDic[ColorsThemeType.Light];
+
+        if (!IsFollowSystemDarkMode || themeType == CurrentColorsThemeInfo.themeType)
             return;
 
-        ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
         ThemeService.SwitchToPreferredTheme(ThemeResourceType.Colors, themeType, false);
         IsNightChecked = App.IsSystemInDarkMode;
-        ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
     }
 
     #endregion
@@ -451,7 +470,7 @@ public partial class ThemeControl : ObservableObject
         // 按照预定义顺序填充项目
         foreach (string key in _resourceKeyToDisplayNameMap[ThemeResourceType.Colors].Keys)
         {
-            if (!CurrentThemeResourceDictionary.Contains(key))
+            if (!CurrentColorsThemeResourceDictionary.Contains(key))
                 continue;
 
             string category = key switch

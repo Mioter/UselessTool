@@ -92,6 +92,18 @@ public class ThemeService
     /// <param name="themeName">主题名称</param>
     public void ReloadThemeFromFileSystem(ThemeResourceType themeResourceType, string themeType, string themeName)
     {
+        // 从默认主题加载
+        if (
+            DefaultThemes?.TryGetValue(themeResourceType, out var themeList) == true
+            && themeList?.TryGetValue(themeType, out var name) == true
+            && name != null
+        )
+        {
+            _themeManager.RegisterAndUpdateTheme(themeResourceType, themeType, themeName);
+            return;
+        }
+
+        // 从文件系统中加载
         string themeFilePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
         if (File.Exists(themeFilePath))
         {
@@ -173,12 +185,18 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
-    public void TryApplyTheme(ThemeResourceType themeResourceType, string themeType, string themeName, bool isChangePreference = true)
+    public void TryApplyTheme(
+        ThemeResourceType themeResourceType,
+        string themeType,
+        string themeName,
+        bool isChangePreference = true
+    )
     {
         try
         {
             _themeManager.ApplyTheme(themeResourceType, themeType, themeName);
-            if (isChangePreference) SaveCurrentThemeAsPreference(themeResourceType);
+            if (isChangePreference)
+                SaveCurrentThemeAsPreference(themeResourceType);
         }
         catch (ArgumentException ex)
         {
@@ -191,7 +209,11 @@ public class ThemeService
     /// </summary>
     /// <param name="themeResourceType">资源类型。</param>
     /// <param name="themeType">主题类型。</param>
-    public void SwitchToPreferredTheme(ThemeResourceType themeResourceType, string themeType, bool isChangePreference = true)
+    public void SwitchToPreferredTheme(
+        ThemeResourceType themeResourceType,
+        string themeType,
+        bool isChangePreference = true
+    )
     {
         string? preferredThemeName = GetPreferredThemeName(themeResourceType, themeType);
         if (preferredThemeName != null)

@@ -13,7 +13,7 @@ public class ColorsDisplayNameModel : ObservableObject
     {
         Key = key;
         DisplayName = displayName;
-        SelectedBrush = Common.ThemeControl.CurrentThemeResourceDictionary[Key] as SolidColorBrush;
+        SelectedBrush = Common.ThemeControl.CurrentColorsThemeResourceDictionary[Key] as SolidColorBrush;
     }
 
     private SolidColorBrush? _selectedBrush;
@@ -24,7 +24,7 @@ public class ColorsDisplayNameModel : ObservableObject
         {
             if (SetProperty(ref _selectedBrush, value))
             {
-                Common.ThemeControl.CurrentThemeResourceDictionary[Key] = SelectedBrush;
+                Common.ThemeControl.CurrentColorsThemeResourceDictionary[Key] = SelectedBrush;
             }
         }
     }
