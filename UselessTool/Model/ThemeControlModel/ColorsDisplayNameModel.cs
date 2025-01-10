@@ -5,7 +5,7 @@ namespace UselessTool.Model.ThemeControlModel;
 
 public class ColorsDisplayNameModel : ObservableObject
 {
-    public string Key { get; set; }
+    private string Key { get; }
 
     public string DisplayName { get; }
 
@@ -13,7 +13,7 @@ public class ColorsDisplayNameModel : ObservableObject
     {
         Key = key;
         DisplayName = displayName;
-        SelectedBrush = Common.ThemeControl.CurrentThemeDict[Key] as SolidColorBrush;
+        SelectedBrush = Common.ThemeControl.CurrentThemeResourceDictionary[Key] as SolidColorBrush;
     }
 
     private SolidColorBrush? _selectedBrush;
@@ -24,7 +24,7 @@ public class ColorsDisplayNameModel : ObservableObject
         {
             if (SetProperty(ref _selectedBrush, value))
             {
-                Common.ThemeControl.CurrentThemeDict[Key] = SelectedBrush;
+                Common.ThemeControl.CurrentThemeResourceDictionary[Key] = SelectedBrush;
             }
         }
     }

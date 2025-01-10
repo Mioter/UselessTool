@@ -3,7 +3,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xml;
-using static UselessTool.Bases.SystemIO.FileSystemHelper;
+using static UselessTool.Bases.FileOperation.FileSystemHelper;
 using static UselessTool.Theme.Tools.DefaultTheme;
 
 namespace UselessTool.Theme.Tools;
@@ -109,7 +109,7 @@ public class ThemeService
     /// </summary>
     public void ApplyPreferredTheme(ThemeResourceType themeResourceType)
     {
-        Dictionary<ThemeResourceType, Dictionary<string, string>> preferences = _userPreferences.LoadUserPreferences();
+        var preferences = _userPreferences.LoadUserPreferences();
         if (
             preferences[themeResourceType].TryGetValue("PreferenceThemeType", out string? currentThemeType)
             && preferences[themeResourceType].TryGetValue(currentThemeType, out string? preferredThemeName)
@@ -144,15 +144,22 @@ public class ThemeService
     /// </summary>
     private void SaveCurrentThemeAsPreference(ThemeResourceType themeResourceType)
     {
-        (string themeType, string themeName) = _themeManager.GetCurrentThemeInfo(themeResourceType);
-        Dictionary<ThemeResourceType, Dictionary<string, string>> preferences = _userPreferences.LoadUserPreferences();
-        preferences[themeResourceType][themeType] = themeName;
-        preferences[themeResourceType]["PreferenceThemeType"] = themeType;
-        _userPreferences.SaveUserPreferences(preferences);
+        try
+        {
+            (string themeType, string themeName) = _themeManager.GetCurrentThemeInfo(themeResourceType);
+            var preferences = _userPreferences.LoadUserPreferences();
+            preferences[themeResourceType][themeType] = themeName;
+            preferences[themeResourceType]["PreferenceThemeType"] = themeType;
+            _userPreferences.SaveUserPreferences(preferences);
+        }
+        catch
+        {
+            throw; // TODO 处理异常
+        }
     }
 
     /// <summary>
-    /// 获取用户偏好设置
+    /// 获取指定主题资源类型的偏好设置
     /// </summary>
     /// <returns>用户偏好设置字典</returns>
     public Dictionary<string, string> GetUserPreferences(ThemeResourceType themeResourceType)
@@ -166,12 +173,12 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
-    public void TryApplyTheme(ThemeResourceType themeResourceType, string themeType, string themeName)
+    public void TryApplyTheme(ThemeResourceType themeResourceType, string themeType, string themeName, bool isChangePreference = true)
     {
         try
         {
             _themeManager.ApplyTheme(themeResourceType, themeType, themeName);
-            SaveCurrentThemeAsPreference(themeResourceType);
+            if (isChangePreference) SaveCurrentThemeAsPreference(themeResourceType);
         }
         catch (ArgumentException ex)
         {
@@ -184,7 +191,22 @@ public class ThemeService
     /// </summary>
     /// <param name="themeResourceType">资源类型。</param>
     /// <param name="themeType">主题类型。</param>
-    public void SwitchToPreferredTheme(ThemeResourceType themeResourceType, string themeType)
+    public void SwitchToPreferredTheme(ThemeResourceType themeResourceType, string themeType, bool isChangePreference = true)
+    {
+        string? preferredThemeName = GetPreferredThemeName(themeResourceType, themeType);
+        if (preferredThemeName != null)
+        {
+            TryApplyTheme(themeResourceType, themeType, preferredThemeName, isChangePreference);
+        }
+    }
+
+    /// <summary>
+    /// 获取指定类别的首选主题名称。
+    /// </summary>
+    /// <param name="themeResourceType">资源类型。</param>
+    /// <param name="themeType">主题类型。</param>
+    /// <returns>首选主题名称，如果不存在则返回 null。</returns>
+    private string? GetPreferredThemeName(ThemeResourceType themeResourceType, string themeType)
     {
         if (
             !_themeManager
@@ -192,15 +214,10 @@ public class ThemeService
                 .TryGetValue(themeType, out Dictionary<string, ResourceDictionary>? themeList)
             || themeList.Count == 0
         )
-            return;
+            return null;
 
         Dictionary<string, string> preferences = GetUserPreferences(themeResourceType);
-        string preferredThemeName = preferences.GetValueOrDefault(themeType) ?? themeList.Keys.First(); // 如果首选主题不存在，则默认应用第一个主题
-
-        if (themeList.ContainsKey(preferredThemeName))
-        {
-            TryApplyTheme(themeResourceType, themeType, preferredThemeName);
-        }
+        return preferences.GetValueOrDefault(themeType) ?? themeList.Keys.FirstOrDefault();
     }
 
     /// <summary>
@@ -218,7 +235,7 @@ public class ThemeService
     )
     {
         string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
-        EnsureDirectoryExists(Path.GetDirectoryName(filePath)!);
+        EnsureFileExists(Path.GetDirectoryName(filePath)!);
         Save(resourceDict, filePath);
         _themeManager.RegisterAndUpdateTheme(themeResourceType, themeType, themeName, resourceDict);
     }
@@ -258,7 +275,7 @@ public class ThemeService
     )
     {
         string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
-        EnsureDirectoryExists(Path.GetDirectoryName(filePath)!);
+        EnsureFileExists(Path.GetDirectoryName(filePath)!);
         newResourceDict ??= _themeManager.GetSpecifiedTheme(themeResourceType, themeType, themeName);
         Save(newResourceDict, filePath);
         _themeManager.RegisterAndUpdateTheme(themeResourceType, themeType, themeName, newResourceDict);
@@ -364,7 +381,7 @@ public class ThemeService
         if (oldFilePath == newFilePath)
             return;
 
-        EnsureDirectoryExists(Path.GetDirectoryName(newFilePath)!);
+        EnsureFileExists(newFilePath);
         File.Move(oldFilePath, newFilePath);
     }
 

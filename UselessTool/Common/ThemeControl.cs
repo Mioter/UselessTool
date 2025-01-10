@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UselessTool.Bases.FileOperation;
 using UselessTool.Model;
 using UselessTool.Model.ThemeControlModel;
 using UselessTool.Theme.Tools;
@@ -36,10 +36,17 @@ public partial class ThemeControl : ObservableObject
 
         ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
 
+        LoadIsFollowSystemDarkModeConfig();
+
         InitializeColorsThemeConfig();
         LoadThemeView();
         InitializeColorsDictionary();
         InitializeConfigurationPanel();
+    }
+
+    ~ThemeControl()
+    {
+        ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
     }
 
     /// <summary>
@@ -49,30 +56,28 @@ public partial class ThemeControl : ObservableObject
     /// <param name="e"></param>
     private void ThemeManager_ThemeChanged(object? sender, ThemeChangedEventArgs e)
     {
-        if (e.ResourceType == ThemeResourceType.Colors)
-        {
-            CurrentThemeDict = e.NewTheme; // 更新当前颜色主题字典
-            SetIsNightChecked(e.ThemeType);
-        }
+        if (e.ResourceType != ThemeResourceType.Colors)
+            return;
+
+        CurrentThemeResourceDictionary = e.NewTheme; // 更新当前颜色主题字典
+        SetIsNightChecked(e.ThemeType);
     }
 
-    #region 字段
+    #region 常量
 
     private const string ThemePath = "Theme";
-
-    private static readonly Dictionary<ColorsThemeType, string> ThemeTypeDic = new()
-    {
-        { ColorsThemeType.Light, "Light" },
-        { ColorsThemeType.Dark, "Dark" },
-    };
 
     #endregion
 
     #region 属性
 
+    public static Dictionary<ColorsThemeType, string> ThemeTypeDic { get; private set; } =
+        new() { { ColorsThemeType.Light, "Light" }, { ColorsThemeType.Dark, "Dark" } };
+    public static ResourceDictionary CurrentThemeResourceDictionary { get; private set; } = [];
+    private JsonConfig<Dictionary<string, bool>> OtherJsonConfig { get; set; } =
+        new JsonConfig<Dictionary<string, bool>>(ThemePath, "other_config.json");
     public ThemeManager ThemeManager { get; }
     public ThemeService ThemeService { get; }
-    public static ResourceDictionary CurrentThemeDict { get; private set; } = [];
 
     #region 通知属性
 
@@ -99,6 +104,12 @@ public partial class ThemeControl : ObservableObject
     /// </summary>
     [ObservableProperty]
     private bool _isContinuousRandomizationColorsAllowed;
+
+    /// <summary>
+    /// 是否跟随系统暗色模式。
+    /// </summary>
+    [ObservableProperty]
+    private bool _isFollowSystemDarkMode;
 
     #endregion
     #endregion
@@ -147,6 +158,7 @@ public partial class ThemeControl : ObservableObject
     private void ToggleTheme(ThemeButtonModel themeButtonModel)
     {
         ThemeService.TryApplyTheme(ThemeResourceType.Colors, themeButtonModel.ThemeType, themeButtonModel.ThemeName);
+        IsFollowSystemDarkMode = false;
     }
 
     /// <summary>
@@ -177,6 +189,27 @@ public partial class ThemeControl : ObservableObject
     }
 
     /// <summary>
+    /// 设置是否跟随系统暗色模式配置。
+    /// </summary>
+    [RelayCommand]
+    private void UpdateIsFollowSystemDarkModeConfigura()
+    {
+        try
+        {
+            var otherConfig =
+                OtherJsonConfig.LoadFromJson()
+                ?? new Dictionary<string, bool>() { { "IsFollowSystemDarkMode", false } };
+            otherConfig["IsFollowSystemDarkMode"] = IsFollowSystemDarkMode;
+
+            OtherJsonConfig.SaveToJson(otherConfig);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"处理主题配置>其他配置时出错：{ex.Message}");
+        }
+    }
+
+    /// <summary>
     /// 设置随机颜色。
     /// </summary>
     [RelayCommand]
@@ -194,6 +227,22 @@ public partial class ThemeControl : ObservableObject
     #endregion
 
     #region 辅助方法
+
+    /// <summary>
+    /// 加载是否跟随系统暗色模式配置。
+    /// </summary>
+    private void LoadIsFollowSystemDarkModeConfig()
+    {
+        try
+        {
+            var otherConfig = OtherJsonConfig.LoadFromJson();
+        }
+        catch
+        {
+            IsFollowSystemDarkMode = false;
+            OtherJsonConfig.SaveToJson(new Dictionary<string, bool>() { { "IsFollowSystemDarkMode", false } });
+        }
+    }
 
     /// <summary>
     /// 初始化主题配置。
@@ -249,6 +298,7 @@ public partial class ThemeControl : ObservableObject
     private void SetIsNightChecked(string themeType)
     {
         IsNightChecked = ThemeTypeDic[ColorsThemeType.Dark] == themeType;
+        IsFollowSystemDarkMode = false;
     }
 
     /// <summary>
@@ -258,13 +308,50 @@ public partial class ThemeControl : ObservableObject
     {
         var currentTheme = ThemeManager.GetCurrentTheme(ThemeResourceType.Colors);
         var random = new Random();
+        bool isDarkMode = IsFollowSystemDarkMode ? App.IsSystemInDarkMode : IsNightChecked;
+
         foreach (object? key in currentTheme.Keys)
         {
-            var randomColor = Color.FromRgb((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+            var isTextOrAccentColor =
+                key.ToString()?.Contains("Text") == true || key.ToString()?.Contains("AccentColor") == true;
+            var randomColor = isDarkMode
+                ? (
+                    isTextOrAccentColor
+                        ? Color.FromRgb(
+                            (byte)random.Next(128, 256),
+                            (byte)random.Next(128, 256),
+                            (byte)random.Next(128, 256)
+                        ) // 亮色区间
+                        : Color.FromRgb((byte)random.Next(0, 128), (byte)random.Next(0, 128), (byte)random.Next(0, 128))
+                ) // 暗色区间
+                : (
+                    isTextOrAccentColor
+                        ? Color.FromRgb((byte)random.Next(0, 128), (byte)random.Next(0, 128), (byte)random.Next(0, 128)) // 暗色区间
+                        : Color.FromRgb(
+                            (byte)random.Next(128, 256),
+                            (byte)random.Next(128, 256),
+                            (byte)random.Next(128, 256)
+                        )
+                ); // 亮色区间
             currentTheme[key] = new SolidColorBrush(randomColor);
         }
         // 等待一段时间再进行下一次随机化
         await Task.Delay(500); // 500 毫秒
+    }
+
+    /// <summary>
+    /// 跟随系统切换浅色/深色主题。
+    /// </summary>
+    /// <param name="themeType"></param>
+    public void FollowSystemToggleLightOrDarkTheme(string themeType)
+    {
+        if (!IsFollowSystemDarkMode)
+            return;
+
+        ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
+        ThemeService.SwitchToPreferredTheme(ThemeResourceType.Colors, themeType, false);
+        IsNightChecked = App.IsSystemInDarkMode;
+        ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
     }
 
     #endregion
@@ -286,55 +373,64 @@ public partial class ThemeControl : ObservableObject
     /// </summary>
     private void InitializeColorsDictionary()
     {
-        var themeConfig = new JsonConfig("Theme", "displayNameMap.json");
+        var themeConfig = new JsonConfig<Dictionary<ThemeResourceType, Dictionary<string, string>>>(
+            "Theme",
+            "displayNameMap.json"
+        );
         try
         {
-            _resourceKeyToDisplayNameMap =
-                themeConfig.LoadFromJson<Dictionary<ThemeResourceType, Dictionary<string, string>>>()
-                ?? throw new NullReferenceException();
+            _resourceKeyToDisplayNameMap = themeConfig.LoadFromJson() ?? GetDefaultResourceKeyToDisplayNameMap();
         }
-        catch (FileNotFoundException)
+        catch (Exception)
         {
-            // 提供默认值
-            _resourceKeyToDisplayNameMap = new Dictionary<ThemeResourceType, Dictionary<string, string>>
-            {
-                {
-                    ThemeResourceType.Colors,
-                    new Dictionary<string, string>
-                    {
-                        // 基础颜色
-                        { "Base.BackgroundColor", "基础背景色" },
-                        { "Base.ForegroundColor", "基础前景色" },
-                        { "Base.AccentColor", "基础强调色" },
-                        // 控件背景色
-                        { "Control.BackgroundColor", "控件背景色" },
-                        { "Control.HoverBackgroundColor", "鼠标悬停时的控件背景色" },
-                        { "Control.PressedBackgroundColor", "按下时的控件背景色" },
-                        // 控件边框色
-                        { "Control.BorderBrushColor", "控件边框色" },
-                        { "Control.HoverBorderBrushColor", "鼠标悬停时的控件边框色" },
-                        { "Control.PressedBorderBrushColor", "按下时的控件边框色" },
-                        // 文本颜色
-                        { "Text.ForegroundColor", "文本前景色" },
-                        { "Text.DeputyLevelColor", "次级文本颜色" },
-                        { "Text.PlaceholderColor", "占位符文本颜色" },
-                        // 边框和分隔线颜色
-                        { "Border.Color", "默认边框颜色" },
-                        { "Border.AccentColor", "强调边框颜色" },
-                        { "Separator.Color", "分隔线颜色" },
-                        // 交互元素颜色
-                        { "Hyperlink.Color", "超链接颜色" },
-                        { "Hyperlink.VisitedColor", "已访问超链接颜色" },
-                        // 其他UI元素颜色
-                        { "Header.BackgroundColor", "头部背景色" },
-                        { "Header.TextColor", "头部文本颜色" },
-                        { "Footer.BackgroundColor", "页脚背景色" },
-                        { "Footer.TextColor", "页脚文本颜色" },
-                    }
-                },
-            };
-            themeConfig.SaveToJson(_resourceKeyToDisplayNameMap);
+            _resourceKeyToDisplayNameMap = GetDefaultResourceKeyToDisplayNameMap();
+            themeConfig.SaveToJson(GetDefaultResourceKeyToDisplayNameMap());
         }
+    }
+
+    /// <summary>
+    /// 提供默认的资源键映射字典
+    /// </summary>
+    /// <returns></returns>
+    private static Dictionary<ThemeResourceType, Dictionary<string, string>> GetDefaultResourceKeyToDisplayNameMap()
+    {
+        return new Dictionary<ThemeResourceType, Dictionary<string, string>>
+        {
+            {
+                ThemeResourceType.Colors,
+                new Dictionary<string, string>
+                {
+                    // 基础颜色
+                    { "Base.BackgroundColor", "基础背景色" },
+                    { "Base.ForegroundColor", "基础前景色" },
+                    { "Base.AccentColor", "基础强调色" },
+                    // 控件背景色
+                    { "Control.BackgroundColor", "控件背景色" },
+                    { "Control.HoverBackgroundColor", "鼠标悬停时的控件背景色" },
+                    { "Control.PressedBackgroundColor", "按下时的控件背景色" },
+                    // 控件边框色
+                    { "Control.BorderBrushColor", "控件边框色" },
+                    { "Control.HoverBorderBrushColor", "鼠标悬停时的控件边框色" },
+                    { "Control.PressedBorderBrushColor", "按下时的控件边框色" },
+                    // 文本颜色
+                    { "Text.ForegroundColor", "文本前景色" },
+                    { "Text.DeputyLevelColor", "次级文本颜色" },
+                    { "Text.PlaceholderColor", "占位符文本颜色" },
+                    // 边框和分隔线颜色
+                    { "Border.Color", "默认边框颜色" },
+                    { "Border.AccentColor", "强调边框颜色" },
+                    { "Separator.Color", "分隔线颜色" },
+                    // 交互元素颜色
+                    { "Hyperlink.Color", "超链接颜色" },
+                    { "Hyperlink.VisitedColor", "已访问超链接颜色" },
+                    // 其他UI元素颜色
+                    { "Header.BackgroundColor", "头部背景色" },
+                    { "Header.TextColor", "头部文本颜色" },
+                    { "Footer.BackgroundColor", "页脚背景色" },
+                    { "Footer.TextColor", "页脚文本颜色" },
+                }
+            },
+        };
     }
 
     /// <summary>
@@ -355,7 +451,7 @@ public partial class ThemeControl : ObservableObject
         // 按照预定义顺序填充项目
         foreach (string key in _resourceKeyToDisplayNameMap[ThemeResourceType.Colors].Keys)
         {
-            if (!CurrentThemeDict.Contains(key))
+            if (!CurrentThemeResourceDictionary.Contains(key))
                 continue;
 
             string category = key switch

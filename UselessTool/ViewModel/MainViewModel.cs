@@ -51,13 +51,13 @@ public partial class MainViewModel : ObservableObject
     {
         if (string.IsNullOrEmpty(NameOfThemesAdded))
         {
-            TipsText = AddRandomEmoticon("请输入有效的主题名称！", EmotionType.Angry);
+            TipsText = AddRandomEmoticon("请输入有效的主题名称！", EmotionType.Angry, AdditionalRules.Cat);
             return;
         }
 
         if (ComboBoxSelectedItem is null)
         {
-            TipsText = AddRandomEmoticon("请先选择颜色主题类型。", EmotionType.Bored);
+            TipsText = AddRandomEmoticon("请先选择颜色主题类型。", EmotionType.Bored, AdditionalRules.Cat);
             return;
         }
         if (
@@ -68,7 +68,7 @@ public partial class MainViewModel : ObservableObject
             )
         )
         {
-            TipsText = AddRandomEmoticon($"{NameOfThemesAdded}主题已存在。", EmotionType.Sad);
+            TipsText = AddRandomEmoticon($"{NameOfThemesAdded}主题已存在。", EmotionType.Sad, AdditionalRules.Lady);
             return;
         }
         try
@@ -83,7 +83,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            TipsText = AddRandomEmoticon($"{ex.Message}+_+", EmotionType.Angry);
+            TipsText = AddRandomEmoticon($"{ex.Message}+_+", EmotionType.Angry, AdditionalRules.Tsundere);
         }
     }
 
@@ -98,7 +98,11 @@ public partial class MainViewModel : ObservableObject
 
         if (themeButtonModel.ThemeType == themeType && themeButtonModel.ThemeName == themeName)
         {
-            TipsText = AddRandomEmoticon($"{themeButtonModel.ThemeName}主题正在使用，无法移除。", EmotionType.Sad);
+            TipsText = AddRandomEmoticon(
+                $"{themeButtonModel.ThemeName}主题正在使用，无法移除。",
+                EmotionType.Sad,
+                AdditionalRules.Lady
+            );
             return;
         }
 
@@ -109,7 +113,8 @@ public partial class MainViewModel : ObservableObject
         {
             TipsText = AddRandomEmoticon(
                 $"{themeButtonModel.ThemeName}主题是默认主题，无法移除。\n就算移除了每次程序启动也会重新出现的。",
-                EmotionType.Happy
+                EmotionType.Happy,
+                AdditionalRules.Lady
             );
             return;
         }
@@ -125,7 +130,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            TipsText = AddRandomEmoticon(ex.Message, EmotionType.Angry);
+            TipsText = AddRandomEmoticon(ex.Message, EmotionType.Angry, AdditionalRules.Tsundere);
         }
     }
 

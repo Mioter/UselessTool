@@ -7,7 +7,7 @@ public enum ThemeResourceType
 {
     Colors,
     Styles,
-    Icons
+    Icons,
 }
 
 /// <summary>

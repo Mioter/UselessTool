@@ -211,6 +211,12 @@
                         Content="选我更奇妙"
                         IsChecked="{Binding ThemeControl.IsContinuousRandomizationColorsAllowed}"
                         Style="{StaticResource CheckBox.Base.Style}" />
+                    <ws:CheckBox
+                        Margin="0,8"
+                        Command="{Binding ThemeControl.UpdateIsFollowSystemDarkModeConfiguraCommand}"
+                        Content="跟随系统暗色模式"
+                        IsChecked="{Binding ThemeControl.IsFollowSystemDarkMode}"
+                        Style="{StaticResource CheckBox.Base.Style}" />
                 </StackPanel>
             </StackPanel>
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
