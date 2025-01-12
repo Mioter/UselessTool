@@ -1,3 +1,4 @@
+using System.Windows;
 using UselessTool.Bases.FileOperation;
 
 namespace UselessTool.Theme.Tools;
@@ -36,9 +37,10 @@ public class UserPreferences(string filePath)
         {
             _jsonConfig.SaveToJson(preferences);
         }
-        catch
+        catch (Exception ex)
         {
             // 处理无法保存的情况。
+            MessageBox.Show($"{ex.Message}", "保存出错");
         }
     }
 

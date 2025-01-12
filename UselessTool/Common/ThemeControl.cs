@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -213,6 +214,10 @@ public partial class ThemeControl : ObservableObject
             otherConfig["IsFollowSystemDarkMode"] = IsFollowSystemDarkMode;
 
             OtherJsonConfig.SaveToJson(otherConfig);
+        }
+        catch (IOException iex)
+        {
+            MessageBox.Show($"{iex.Message}", "保存出错");
         }
         catch (Exception ex)
         {

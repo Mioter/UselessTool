@@ -105,7 +105,7 @@ internal static class EmotionEmoticonManager
         catch (Exception ex)
         {
             // 可以在此处理错误
-            MessageBox.Show($"{ex.Message}");
+            MessageBox.Show($"{ex.Message}", "保存出错");
         }
     }
 }

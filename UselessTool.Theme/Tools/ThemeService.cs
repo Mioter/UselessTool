@@ -161,9 +161,9 @@ public class ThemeService
             (string themeType, string themeName) = _themeManager.GetCurrentThemeInfo(themeResourceType);
             SaveThemeAsPreference(themeResourceType, themeType, themeName);
         }
-        catch
+        catch (Exception ex)
         {
-            throw; // TODO 处理异常
+            MessageBox.Show($"{ex.Message}", "保存出错");
         }
     }
 
