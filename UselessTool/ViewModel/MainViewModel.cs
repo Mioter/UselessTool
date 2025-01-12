@@ -4,7 +4,6 @@ using UselessTool.Common;
 using UselessTool.Model;
 using UselessTool.Theme.Tools;
 using static UselessTool.Amusing.TextProcess.EmotionEmoticonGenerator;
-using static UselessTool.Theme.Tools.DefaultTheme;
 
 namespace UselessTool.ViewModel;
 
@@ -107,8 +106,8 @@ public partial class MainViewModel : ObservableObject
         }
 
         if (
-            DefaultThemes[ThemeResourceType.Colors].TryGetValue(themeButtonModel.ThemeType, out string? value)
-            && value.Contains(themeButtonModel.ThemeName)
+            ThemeControl.DefaultThemes[ThemeResourceType.Colors].TryGetValue(themeButtonModel.ThemeType, out string? value)
+         && value.Contains(themeButtonModel.ThemeName)
         )
         {
             TipsText = AddRandomEmoticon(

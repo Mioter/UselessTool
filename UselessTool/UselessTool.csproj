@@ -68,6 +68,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\UselessTool.Amusing\UselessTool.Amusing.csproj" />
+      <ProjectReference Include="..\UselessTool.Assets\UselessTool.Assets.csproj" />
       <ProjectReference Include="..\UselessTool.Control\UselessTool.Control.csproj" />
       <ProjectReference Include="..\UselessTool.Theme\UselessTool.Theme.csproj" />
       <ProjectReference Include="..\UselessTool.Utilities\UselessTool.Utilities.csproj" />
@@ -78,7 +79,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Resource Include="Assets\Fonts\IconFont.ttf" />
+      <Folder Include="Assets\" />
     </ItemGroup>
 
 </Project>

@@ -31,6 +31,6 @@ public static class FileSystemHelper
         if (fileInfo.Exists)
             return;
 
-        using FileStream stream = fileInfo.Create();
+        using var stream = fileInfo.Create();
     }
 }

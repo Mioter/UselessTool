@@ -28,11 +28,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\Styles\" />
-      <Folder Include="Resources\Icons\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\UselessTool.Bases\UselessTool.Bases.csproj" />
     </ItemGroup>
 

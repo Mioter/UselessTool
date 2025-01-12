@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Xml;
 using static UselessTool.Bases.FileOperation.FileSystemHelper;
-using static UselessTool.Theme.Tools.DefaultTheme;
 
 namespace UselessTool.Theme.Tools;
 
@@ -13,8 +12,9 @@ public class ThemeService
     private readonly Dictionary<ThemeResourceType, string> _resourcePaths;
     private readonly ThemeManager _themeManager;
     private readonly UserPreferences _userPreferences;
-
-    public ThemeService(ThemeManager themeManager, string themesBasePath)
+    private readonly Dictionary<ThemeResourceType, Dictionary<string, string>> _defaultThemes;
+  
+    public ThemeService(ThemeManager themeManager,Dictionary<ThemeResourceType, Dictionary<string, string>> defaultThemes,string themesBasePath)
     {
         string baseDirectory = Directory.GetCurrentDirectory();
         _resourcePaths = [];
@@ -24,6 +24,7 @@ public class ThemeService
         }
 
         _themeManager = themeManager;
+        _defaultThemes = defaultThemes;
         _userPreferences = new UserPreferences(themesBasePath);
     }
 
@@ -57,14 +58,11 @@ public class ThemeService
     {
         foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
         {
-            if (!DefaultThemes.TryGetValue(resourceType, out Dictionary<string, string>? value))
+            if (!_defaultThemes.TryGetValue(resourceType, out var value))
                 continue;
 
-            foreach (var themeInfo in value)
+            foreach ((string themeType, string themeName) in value)
             {
-                string themeType = themeInfo.Key;
-                string themeName = themeInfo.Value;
-
                 _themeManager.RegisterAndUpdateTheme(resourceType, themeType, themeName);
             }
         }
@@ -94,9 +92,8 @@ public class ThemeService
     {
         // 从默认主题加载
         if (
-            DefaultThemes?.TryGetValue(themeResourceType, out var themeList) == true
-            && themeList?.TryGetValue(themeType, out var name) == true
-            && name != null
+            _defaultThemes.TryGetValue(themeResourceType, out var themeList)
+         && themeList.TryGetValue(themeType, out string _)
         )
         {
             _themeManager.RegisterAndUpdateTheme(themeResourceType, themeType, themeName);
@@ -132,11 +129,9 @@ public class ThemeService
         }
         else
         {
-            if (DefaultThemes.TryGetValue(themeResourceType, out Dictionary<string, string>? value))
-            {
-                var defaultTheme = value.FirstOrDefault();
-                _themeManager.ApplyTheme(themeResourceType, defaultTheme.Key, defaultTheme.Value);
-            }
+            if (!_defaultThemes.TryGetValue(themeResourceType, out var value)) return;
+            var defaultTheme = value.FirstOrDefault();
+            _themeManager.ApplyTheme(themeResourceType, defaultTheme.Key, defaultTheme.Value);
         }
     }
 
@@ -196,6 +191,7 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
+    /// <param name="isChangePreference">是否更改偏好（默认true）</param>
     public void TryApplyTheme(
         ThemeResourceType themeResourceType,
         string themeType,
@@ -220,6 +216,7 @@ public class ThemeService
     /// </summary>
     /// <param name="themeResourceType">资源类型。</param>
     /// <param name="themeType">主题类型。</param>
+    /// <param name="isChangePreference">是否更改偏好（默认true）</param>
     public void SwitchToPreferredTheme(
         ThemeResourceType themeResourceType,
         string themeType,
@@ -244,12 +241,12 @@ public class ThemeService
         if (
             !_themeManager
                 .ThemeResources[themeResourceType]
-                .TryGetValue(themeType, out Dictionary<string, ResourceDictionary>? themeList)
+                .TryGetValue(themeType, out var themeList)
             || themeList.Count == 0
         )
             return null;
 
-        Dictionary<string, string> preferences = GetUserPreferences(themeResourceType);
+        var preferences = GetUserPreferences(themeResourceType);
         return preferences.GetValueOrDefault(themeType) ?? themeList.Keys.FirstOrDefault();
     }
 

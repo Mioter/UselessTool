@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Resource Include="Fonts\IconFont.ttf" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="Styles\ConstColors.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\Generic.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\Base.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\Default.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Styles\ScrollViewer.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Resources\Colors\Dark\Black.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Resources\Colors\Light\White.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="EleCho.WpfSuite.Controls" Version="0.9.16" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\UselessTool.Utilities\UselessTool.Utilities.csproj" />
+    </ItemGroup>
+
+</Project>

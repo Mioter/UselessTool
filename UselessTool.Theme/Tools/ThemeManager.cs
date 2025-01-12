@@ -15,7 +15,8 @@ public class ThemeManager
     public event EventHandler<ThemeChangingEventArgs>? ThemeChanging; // 定义主题更改前事件
     public event EventHandler<ThemeChangedEventArgs>? ThemeChanged; // 定义主题更改后事件
 
-    private const string CurrentAssemblyName = "UselessTool.Theme";
+    public string? AssemblyName { get; init; }
+    public string? ResourceBasedPath { get; init; }
 
     public ThemeManager()
     {
@@ -72,10 +73,11 @@ public class ThemeManager
     )
     {
         if (string.IsNullOrEmpty(assemblyName))
-            assemblyName = CurrentAssemblyName;
-
+        {
+            assemblyName = AssemblyName ?? throw new ArgumentNullException(nameof(assemblyName));
+        }
         if (string.IsNullOrEmpty(resourcePath))
-            resourcePath = $"Resources/{resourceType}/{themeType}/{themeName}.xaml";
+            resourcePath = $"{ResourceBasedPath}/{resourceType}/{themeType}/{themeName}.xaml";
 
         string uri = $"/{assemblyName};component/{resourcePath}";
         RegisterAndUpdateTheme(
@@ -156,9 +158,7 @@ public class ThemeManager
 
         // 如果当前主题已重命名，则更新当前主题信息
         if (CurrentThemesInfo[resourceType].Equals(new ThemeInfo(oldThemeType, oldThemeName)))
-        {
             CurrentThemesInfo[resourceType] = new ThemeInfo(newThemeType, newThemeName);
-        }
     }
 
     /// <summary>
@@ -264,7 +264,7 @@ public class ThemeManager
     /// 确保资源类型存在。 如果不存在，则创建一个空的主题类型集合
     /// </summary>
     /// <param name="resourceType">资源类型</param>
-    internal void EnsureResourceTypeExists(ThemeResourceType resourceType)
+    private void EnsureResourceTypeExists(ThemeResourceType resourceType)
     {
         if (!ThemeResources.ContainsKey(resourceType))
         {

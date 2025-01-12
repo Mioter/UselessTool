@@ -32,8 +32,13 @@ public partial class ThemeControl : ObservableObject
 
     private ThemeControl()
     {
-        ThemeManager = new ThemeManager();
-        ThemeService = new ThemeService(ThemeManager, ThemePath);
+        ThemeManager = new ThemeManager
+        {
+            AssemblyName = "UselessTool.Assets",
+            ResourceBasedPath = "Themes",
+
+        };
+        ThemeService = new ThemeService(ThemeManager, DefaultThemes,ThemePath);
 
         ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
 
@@ -73,14 +78,19 @@ public partial class ThemeControl : ObservableObject
 
     #region 属性
 
-    public static Dictionary<ColorsThemeType, string> ThemeTypeDic { get; private set; } =
+    public static Dictionary<ThemeResourceType, Dictionary<string, string>> DefaultThemes { get; } =
+        new()
+        {
+            {
+                ThemeResourceType.Colors,
+                new Dictionary<string, string> { { "Light", "White" }, { "Dark", "Black" } }
+            },
+        };
+    public static Dictionary<ColorsThemeType, string> ThemeTypeDic { get; } =
         new() { { ColorsThemeType.Light, "Light" }, { ColorsThemeType.Dark, "Dark" } };
     public static ResourceDictionary CurrentColorsThemeResourceDictionary { get; private set; } = [];
-
     public static (string themeType, string themeName) CurrentColorsThemeInfo { get; private set; }
-
-    private JsonConfig<Dictionary<string, bool>> OtherJsonConfig { get; set; } =
-        new JsonConfig<Dictionary<string, bool>>(ThemePath, "other_config.json");
+    private JsonConfig<Dictionary<string, bool>> OtherJsonConfig { get; } = new(ThemePath, "other_config.json");
     public ThemeManager ThemeManager { get; }
     public ThemeService ThemeService { get; }
 
@@ -204,13 +214,13 @@ public partial class ThemeControl : ObservableObject
     /// 设置是否跟随系统暗色模式配置。
     /// </summary>
     [RelayCommand]
-    private void UpdateIsFollowSystemDarkModeConfigura()
+    private void UpdateIsFollowSystemDarkModeConfig()
     {
         try
         {
             var otherConfig =
                 OtherJsonConfig.LoadFromJson()
-                ?? new Dictionary<string, bool>() { { "IsFollowSystemDarkMode", false } };
+                ?? new Dictionary<string, bool> { { "IsFollowSystemDarkMode", false } };
             otherConfig["IsFollowSystemDarkMode"] = IsFollowSystemDarkMode;
 
             OtherJsonConfig.SaveToJson(otherConfig);
@@ -253,13 +263,13 @@ public partial class ThemeControl : ObservableObject
         {
             var otherConfig =
                 OtherJsonConfig.LoadFromJson()
-                ?? new Dictionary<string, bool>() { { "IsFollowSystemDarkMode", false } };
+                ?? new Dictionary<string, bool> { { "IsFollowSystemDarkMode", false } };
             IsFollowSystemDarkMode = otherConfig["IsFollowSystemDarkMode"];
         }
         catch
         {
             IsFollowSystemDarkMode = false;
-            OtherJsonConfig.SaveToJson(new Dictionary<string, bool>() { { "IsFollowSystemDarkMode", false } });
+            OtherJsonConfig.SaveToJson(new Dictionary<string, bool> { { "IsFollowSystemDarkMode", false } });
         }
     }
 
@@ -337,24 +347,20 @@ public partial class ThemeControl : ObservableObject
             var isTextOrAccentColor =
                 key.ToString()?.Contains("Text") == true || key.ToString()?.Contains("AccentColor") == true;
             var randomColor = isDarkMode
-                ? (
-                    isTextOrAccentColor
-                        ? Color.FromRgb(
-                            (byte)random.Next(128, 256),
-                            (byte)random.Next(128, 256),
-                            (byte)random.Next(128, 256)
-                        ) // 亮色区间
-                        : Color.FromRgb((byte)random.Next(0, 128), (byte)random.Next(0, 128), (byte)random.Next(0, 128))
-                ) // 暗色区间
-                : (
-                    isTextOrAccentColor
-                        ? Color.FromRgb((byte)random.Next(0, 128), (byte)random.Next(0, 128), (byte)random.Next(0, 128)) // 暗色区间
-                        : Color.FromRgb(
-                            (byte)random.Next(128, 256),
-                            (byte)random.Next(128, 256),
-                            (byte)random.Next(128, 256)
-                        )
-                ); // 亮色区间
+                ? isTextOrAccentColor
+                    ? Color.FromRgb(
+                        (byte)random.Next(128, 256),
+                        (byte)random.Next(128, 256),
+                        (byte)random.Next(128, 256)
+                    ) // 亮色区间
+                    : Color.FromRgb((byte)random.Next(0, 128), (byte)random.Next(0, 128), (byte)random.Next(0, 128)) // 暗色区间
+                : isTextOrAccentColor
+                    ? Color.FromRgb((byte)random.Next(0, 128), (byte)random.Next(0, 128), (byte)random.Next(0, 128)) // 暗色区间
+                    : Color.FromRgb(
+                        (byte)random.Next(128, 256),
+                        (byte)random.Next(128, 256),
+                        (byte)random.Next(128, 256)
+                    ); // 亮色区间
             currentTheme[key] = new SolidColorBrush(randomColor);
         }
         // 等待一段时间再进行下一次随机化
@@ -364,7 +370,6 @@ public partial class ThemeControl : ObservableObject
     /// <summary>
     /// 跟随系统切换浅色/深色主题。
     /// </summary>
-    /// <param name="themeType"></param>
     public void FollowSystemToggleLightOrDarkTheme()
     {
         var themeType = App.IsSystemInDarkMode
