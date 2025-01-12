@@ -5,6 +5,7 @@
         <ResourceDictionary Source="ConstColors.xaml" />
         <ResourceDictionary Source="ScrollViewer.xaml" />
     </ResourceDictionary.MergedDictionaries>
+    
+    <FontFamily x:Key="IconFont">pack://application:,,,/UselessTool.Assets;component/Fonts/#IconFont</FontFamily>
 
-    <FontFamily x:Key="IconFont">pack://application:,,,/UselessTool;component/Assets/Fonts/#IconFont</FontFamily>
 </ResourceDictionary>

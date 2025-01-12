@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Windows.Media;
 
-namespace UselessTool.Theme.Core;
+namespace UselessTool.Theme.Other;
 
 public static class BasicColor
 {

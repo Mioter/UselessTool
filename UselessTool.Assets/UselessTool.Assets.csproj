@@ -40,7 +40,14 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\UselessTool.Theme\UselessTool.Theme.csproj" />
       <ProjectReference Include="..\UselessTool.Utilities\UselessTool.Utilities.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="EleCho.WpfSuite.Layouts">
+        <HintPath>C:\Users\QAQ\.nuget\packages\elecho.wpfsuite.layouts\0.9.1\lib\net8.0-windows7.0\EleCho.WpfSuite.Layouts.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

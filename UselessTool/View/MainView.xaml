@@ -11,6 +11,7 @@
     xmlns:userControls="clr-namespace:UselessTool.View.UserControls"
     xmlns:viewmodel="clr-namespace:UselessTool.ViewModel"
     xmlns:ws="https://schemas.elecho.dev/wpfsuite"
+    xmlns:other="clr-namespace:UselessTool.Theme.Other;assembly=UselessTool.Theme"
     Title="MainView"
     Width="1200"
     Height="800"
@@ -206,17 +207,15 @@
                         Command="{Binding ThemeControl.SetRandomColorsCommand}"
                         Content="点我"
                         Style="{StaticResource Button.Base.Style}" />
-                    <ws:CheckBox
+                    <CheckBox
                         Margin="0,8"
                         Content="选我更奇妙"
-                        IsChecked="{Binding ThemeControl.IsContinuousRandomizationColorsAllowed}"
-                        Style="{StaticResource CheckBox.Base.Style}" />
-                    <ws:CheckBox
+                        IsChecked="{Binding ThemeControl.IsContinuousRandomizationColorsAllowed}"/>
+                    <CheckBox
                         Margin="0,8"
-                        Command="{Binding ThemeControl.UpdateIsFollowSystemDarkModeConfiguraCommand}"
+                        Command="{Binding ThemeControl.UpdateIsFollowSystemDarkModeConfigCommand}"
                         Content="跟随系统暗色模式"
-                        IsChecked="{Binding ThemeControl.IsFollowSystemDarkMode}"
-                        Style="{StaticResource CheckBox.Base.Style}" />
+                        IsChecked="{Binding ThemeControl.IsFollowSystemDarkMode}"/>
                 </StackPanel>
             </StackPanel>
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
@@ -243,7 +242,7 @@
                                                     Style="{StaticResource Label.Base.Style}" />
                                                 <ws:ComboBox
                                                     MinWidth="200"
-                                                    ItemsSource="{x:Static theme:BasicColor.Brushes}"
+                                                    ItemsSource="{x:Static other:BasicColor.Brushes}"
                                                     SelectedValue="{Binding SelectedBrush}"
                                                     SelectedValuePath="Brush"
                                                     Style="{StaticResource ComboBox.Colors.Style}" />

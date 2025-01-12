@@ -78,8 +78,4 @@
       <None Remove="Assets\Fonts\Iconfont.ttf" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Assets\" />
-    </ItemGroup>
-
 </Project>
