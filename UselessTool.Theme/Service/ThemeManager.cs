@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace UselessTool.Theme.Tools;
+namespace UselessTool.Theme.Service;
 
 public class ThemeManager
 {
@@ -213,7 +213,7 @@ public class ThemeManager
     {
         return
             !ThemeResources.TryGetValue(resourceType, out var themesByType)
-            || !themesByType.TryGetValue(themeType, out Dictionary<string, ResourceDictionary>? themes)
+            || !themesByType.TryGetValue(themeType, out var themes)
             || !themes.TryGetValue(themeName, out var theme)
             ? throw new ArgumentException("主题未注册。")
             : theme;
@@ -256,7 +256,7 @@ public class ThemeManager
     public bool IsThemeRegistered(ThemeResourceType resourceType, string themeType, string themeName)
     {
         return ThemeResources.TryGetValue(resourceType, out var themesByType)
-            && themesByType.TryGetValue(themeType, out Dictionary<string, ResourceDictionary>? themes)
+            && themesByType.TryGetValue(themeType, out var themes)
             && themes.ContainsKey(themeName);
     }
 

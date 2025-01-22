@@ -11,7 +11,7 @@
     <ItemGroup>
       <PackageReference Include="CalcBinding6" Version="1.1.0" />
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-      <PackageReference Include="EleCho.WpfSuite" Version="0.9.16" />
+      <PackageReference Include="EleCho.WpfSuite" Version="0.10.0.1" />
     </ItemGroup>
 
     <ItemGroup>

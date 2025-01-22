@@ -17,7 +17,7 @@
         <Setter Property="HeaderHoverBackground" Value="{DynamicResource Control.HoverBackgroundColor}" />
         <Setter Property="HeaderPressedBackground" Value="{DynamicResource Control.HoverBorderBrushColor}" />
         <Setter Property="HeaderPressedForeground" Value="{DynamicResource Header.TextColor}" />
-        <Setter Property="HeaderCheckedForeground" Value="{DynamicResource Base.AccentColor}" />
+
         <Setter Property="HeaderCornerRadius" Value="{Binding CornerRadius, RelativeSource={RelativeSource Mode=Self}}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>

@@ -1,7 +1,7 @@
 using System.Windows;
 using UselessTool.Bases.FileOperation;
 
-namespace UselessTool.Theme.Tools;
+namespace UselessTool.Theme.Service;
 
 public class UserPreferences(string filePath)
 {

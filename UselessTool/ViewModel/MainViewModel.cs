@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UselessTool.Common;
 using UselessTool.Model;
-using UselessTool.Theme.Tools;
+using UselessTool.Theme.Service;
 using static UselessTool.Amusing.TextProcess.EmotionEmoticonGenerator;
 
 namespace UselessTool.ViewModel;
@@ -106,7 +106,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         if (
-            ThemeControl.DefaultThemes[ThemeResourceType.Colors].TryGetValue(themeButtonModel.ThemeType, out string? value)
+            ThemeControl.DefaultThemes[ThemeResourceType.Colors].TryGetValue(themeButtonModel.ThemeType, out string[]? value)
          && value.Contains(themeButtonModel.ThemeName)
         )
         {

@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using UselessTool.Bases.FileOperation;
 using UselessTool.Model;
 using UselessTool.Model.ThemeControlModel;
-using UselessTool.Theme.Tools;
+using UselessTool.Theme.Service;
 
 namespace UselessTool.Common;
 
@@ -32,13 +32,8 @@ public partial class ThemeControl : ObservableObject
 
     private ThemeControl()
     {
-        ThemeManager = new ThemeManager
-        {
-            AssemblyName = "UselessTool.Assets",
-            ResourceBasedPath = "Themes",
-
-        };
-        ThemeService = new ThemeService(ThemeManager, DefaultThemes,ThemePath);
+        ThemeManager = new ThemeManager { AssemblyName = "UselessTool.Assets", ResourceBasedPath = "Themes" };
+        ThemeService = new ThemeService(ThemeManager, DefaultThemes, ThemePath);
 
         ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
 
@@ -78,12 +73,12 @@ public partial class ThemeControl : ObservableObject
 
     #region 属性
 
-    public static Dictionary<ThemeResourceType, Dictionary<string, string>> DefaultThemes { get; } =
+    public static Dictionary<ThemeResourceType, Dictionary<string, string[]>> DefaultThemes { get; } =
         new()
         {
             {
                 ThemeResourceType.Colors,
-                new Dictionary<string, string> { { "Light", "White" }, { "Dark", "Black" } }
+                new Dictionary<string, string[]> { { "Light", ["White"] }, { "Dark", ["Black"] } }
             },
         };
     public static Dictionary<ColorsThemeType, string> ThemeTypeDic { get; } =
@@ -183,6 +178,17 @@ public partial class ThemeControl : ObservableObject
     [RelayCommand]
     private void UpdateTheme()
     {
+        if (
+            ThemeService.IsDefaultTheme(
+                ThemeResourceType.Colors,
+                CurrentColorsThemeInfo.themeType,
+                CurrentColorsThemeInfo.themeName
+            )
+        )
+        {
+            MessageBox.Show("无法修改默认主题！");
+            return;
+        }
         ThemeService.UpdateThemeAndSaveToFileSystem(
             ThemeResourceType.Colors,
             CurrentColorsThemeInfo.themeType,
@@ -219,8 +225,7 @@ public partial class ThemeControl : ObservableObject
         try
         {
             var otherConfig =
-                OtherJsonConfig.LoadFromJson()
-                ?? new Dictionary<string, bool> { { "IsFollowSystemDarkMode", false } };
+                OtherJsonConfig.LoadFromJson() ?? new Dictionary<string, bool> { { "IsFollowSystemDarkMode", false } };
             otherConfig["IsFollowSystemDarkMode"] = IsFollowSystemDarkMode;
 
             OtherJsonConfig.SaveToJson(otherConfig);
@@ -262,8 +267,7 @@ public partial class ThemeControl : ObservableObject
         try
         {
             var otherConfig =
-                OtherJsonConfig.LoadFromJson()
-                ?? new Dictionary<string, bool> { { "IsFollowSystemDarkMode", false } };
+                OtherJsonConfig.LoadFromJson() ?? new Dictionary<string, bool> { { "IsFollowSystemDarkMode", false } };
             IsFollowSystemDarkMode = otherConfig["IsFollowSystemDarkMode"];
         }
         catch
@@ -344,7 +348,7 @@ public partial class ThemeControl : ObservableObject
 
         foreach (object? key in currentTheme.Keys)
         {
-            var isTextOrAccentColor =
+            bool isTextOrAccentColor =
                 key.ToString()?.Contains("Text") == true || key.ToString()?.Contains("AccentColor") == true;
             var randomColor = isDarkMode
                 ? isTextOrAccentColor
@@ -372,7 +376,7 @@ public partial class ThemeControl : ObservableObject
     /// </summary>
     public void FollowSystemToggleLightOrDarkTheme()
     {
-        var themeType = App.IsSystemInDarkMode
+        string themeType = App.IsSystemInDarkMode
             ? ThemeTypeDic[ColorsThemeType.Dark]
             : ThemeTypeDic[ColorsThemeType.Light];
 

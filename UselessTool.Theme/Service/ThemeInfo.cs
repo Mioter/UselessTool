@@ -1,7 +1,7 @@
-namespace UselessTool.Theme.Tools;
+namespace UselessTool.Theme.Service;
 
 /// <summary>
-/// Ö÷Ìâ×ÊÔ´ÀàĞÍ
+/// ä¸»é¢˜èµ„æºç±»å‹
 /// </summary>
 public enum ThemeResourceType
 {
@@ -11,10 +11,10 @@ public enum ThemeResourceType
 }
 
 /// <summary>
-/// Ö÷ÌâĞÅÏ¢
+/// ä¸»é¢˜ä¿¡æ¯
 /// </summary>
-/// <param name="themeType">Ö÷ÌâÀàĞÍ</param>
-/// <param name="themeName">Ö÷ÌâÃû³Æ</param>
+/// <param name="themeType">ä¸»é¢˜ç±»å‹</param>
+/// <param name="themeName">ä¸»é¢˜åç§°</param>
 public readonly struct ThemeInfo(string themeType, string themeName) : IEquatable<ThemeInfo>
 {
     public string ThemeType { get; } = themeType ?? throw new ArgumentNullException(nameof(themeType));
@@ -47,15 +47,15 @@ public readonly struct ThemeInfo(string themeType, string themeName) : IEquatabl
 }
 
 /// <summary>
-/// Ö÷ÌâĞÅÏ¢À©Õ¹·½·¨
+/// ä¸»é¢˜ä¿¡æ¯æ‰©å±•æ–¹æ³•
 /// </summary>
 public static class ThemeInfoExtensions
 {
     /// <summary>
-    /// Ôª×é×ª»»ÎªÖ÷ÌâĞÅÏ¢
+    /// å…ƒç»„è½¬æ¢ä¸ºä¸»é¢˜ä¿¡æ¯
     /// </summary>
-    /// <param name="tuple">Ôª×é</param>
-    /// <returns>ThemeInfo½á¹¹</returns>
+    /// <param name="tuple">å…ƒç»„</param>
+    /// <returns>ThemeInfoç»“æ„</returns>
     public static ThemeInfo ToThemeInfo(this (string themeType, string themeName) tuple)
     {
         return new ThemeInfo(tuple.themeType, tuple.themeName);

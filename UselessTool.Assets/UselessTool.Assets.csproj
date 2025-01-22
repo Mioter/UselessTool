@@ -36,7 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="EleCho.WpfSuite.Controls" Version="0.9.16" />
+      <PackageReference Include="EleCho.WpfSuite.Controls" Version="0.10.0.1" />
     </ItemGroup>
 
     <ItemGroup>
