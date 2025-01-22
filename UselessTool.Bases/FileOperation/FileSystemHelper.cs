@@ -25,7 +25,7 @@ public static class FileSystemHelper
 
         // 获取文件的目录路径，并确保目录存在
         string? directoryPath = fileInfo.DirectoryName;
-        if (directoryPath != null)
+        if (directoryPath == null)
             EnsureDirectoryExists(directoryPath);
 
         if (fileInfo.Exists)

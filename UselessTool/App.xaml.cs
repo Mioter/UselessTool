@@ -38,16 +38,10 @@ public partial class App : Application
     private static bool IsLightTheme()
     {
         using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath);
-        if (key != null)
-        {
-            var registryValueObject = key.GetValue(RegistryValueName);
-            if (registryValueObject != null)
-            {
-                var registryValue = (int)registryValueObject;
-                return registryValue == 1;
-            }
-        }
-        return true; // 默认返回Light Theme
+        object? registryValueObject = key?.GetValue(RegistryValueName);
+        if (registryValueObject == null) return true; // 默认返回Light Theme
+        int registryValue = (int)registryValueObject;
+        return registryValue == 1;
     }
 
     protected override void OnExit(ExitEventArgs e)

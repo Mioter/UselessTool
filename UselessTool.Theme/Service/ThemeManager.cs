@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace UselessTool.Theme.Tools;
+namespace UselessTool.Theme.Service;
 
 public class ThemeManager
 {

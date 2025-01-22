@@ -11,7 +11,7 @@
     xmlns:userControls="clr-namespace:UselessTool.View.UserControls"
     xmlns:viewmodel="clr-namespace:UselessTool.ViewModel"
     xmlns:ws="https://schemas.elecho.dev/wpfsuite"
-    xmlns:other="clr-namespace:UselessTool.Theme.Other;assembly=UselessTool.Theme"
+    xmlns:other="clr-namespace:UselessTool.Theme.Common;assembly=UselessTool.Theme"
     Title="MainView"
     Width="1200"
     Height="800"
@@ -32,7 +32,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" theme:ThemeProps.Background="{DynamicResource Header.BackgroundColor}">
             <Label
-                Content="Useless Tools"
+                Content="Useless Service"
                 FontSize="12"
                 FontWeight="Bold"
                 Foreground="{DynamicResource Header.TextColor}"
@@ -46,7 +46,6 @@
                     <ws:Button
                         Name="ThemeButton"
                         Command="{Binding ThemeControl.ToggleThemeViewCommand}"
-                        Foreground="{DynamicResource Header.TextColor}"
                         Style="{DynamicResource Button.WinButton.Style}"
                         Visibility="{Binding Converter={StaticResource ValueToVisibilityConverter}}">
                         <ws:ConditionalControl Condition="{Binding ThemeControl.IsOpenThemeView}">
@@ -55,11 +54,11 @@
                                     ap:BorderHelper.AutoCornerRadius="True"
                                     BorderBrush="{DynamicResource Header.TextColor}"
                                     BorderThickness="1">
-                                    <TextBlock Margin="5" Text="&#xe775;" />
+                                    <TextBlock Foreground="{DynamicResource Header.TextColor}" Margin="5" Text="&#xe775;" />
                                 </Border>
                             </ws:ConditionalControl.ContentWhenTrue>
                             <ws:ConditionalControl.ContentWhenFalse>
-                                <TextBlock Text="&#xe775;" />
+                                <TextBlock Foreground="{DynamicResource Header.TextColor}" Text="&#xe775;" />
                             </ws:ConditionalControl.ContentWhenFalse>
                         </ws:ConditionalControl>
                     </ws:Button>
@@ -79,10 +78,10 @@
                     Style="{DynamicResource Button.WinButton.Style}">
                     <ws:ConditionalControl Condition="{Binding ThemeControl.IsNightChecked}">
                         <ws:ConditionalControl.ContentWhenTrue>
-                            <TextBlock Text="&#xe622;" />
+                            <TextBlock Foreground="{DynamicResource Header.TextColor}" Text="&#xe622;" />
                         </ws:ConditionalControl.ContentWhenTrue>
                         <ws:ConditionalControl.ContentWhenFalse>
-                            <TextBlock Text="&#xe8af;" />
+                            <TextBlock Foreground="{DynamicResource Header.TextColor}" Text="&#xe8af;" />
                         </ws:ConditionalControl.ContentWhenFalse>
                     </ws:ConditionalControl>
                 </ws:Button>
@@ -96,14 +95,13 @@
                     ws:WindowOption.IsMaximumButton="True"
                     Command="{Binding TitleBarViewMode.ToggleWindowStateCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                    Foreground="{DynamicResource Header.TextColor}"
                     Style="{DynamicResource Button.WinButton.Style}">
                     <ws:ConditionalControl Condition="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}, Converter={x:Static ws:NotEqualConverter.Instance}, ConverterParameter={x:Static WindowState.Maximized}}">
                         <ws:ConditionalControl.ContentWhenTrue>
-                            <TextBlock Text="&#xe651;" />
+                            <TextBlock Foreground="{DynamicResource Header.TextColor}" Text="&#xe651;" />
                         </ws:ConditionalControl.ContentWhenTrue>
                         <ws:ConditionalControl.ContentWhenFalse>
-                            <TextBlock Text="&#xe614;" />
+                            <TextBlock Foreground="{DynamicResource Header.TextColor}" Text="&#xe614;" />
                         </ws:ConditionalControl.ContentWhenFalse>
                     </ws:ConditionalControl>
                 </ws:Button>
