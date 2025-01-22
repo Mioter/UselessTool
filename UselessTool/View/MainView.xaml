@@ -32,7 +32,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" theme:ThemeProps.Background="{DynamicResource Header.BackgroundColor}">
             <Label
-                Content="Useless Service"
+                Content="Useless Tool"
                 FontSize="12"
                 FontWeight="Bold"
                 Foreground="{DynamicResource Header.TextColor}"
