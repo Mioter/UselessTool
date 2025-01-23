@@ -48,7 +48,7 @@
                 </Trigger>
                 <Trigger Property="IsChecked" Value="True">
                     <Setter TargetName="_select" Property="BorderBrush" Value="{DynamicResource Control.HoverBorderBrushColor}" />
-                    <Setter TargetName="_content" Property="Foreground" Value="{DynamicResource Control.PressedBorderBrushColor}" />
+                    <Setter TargetName="_content" Property="Foreground" Value="{DynamicResource Base.AccentColor}" />
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>

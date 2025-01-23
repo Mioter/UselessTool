@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UselessTool.Common;
 using UselessTool.Model;
-using UselessTool.Theme.Service;
 using static UselessTool.Amusing.TextProcess.EmotionEmoticonGenerator;
 
 namespace UselessTool.ViewModel;
@@ -19,11 +18,13 @@ public partial class MainViewModel : ObservableObject
             ComboBoxItems.Add(themeType);
 
         // 为什么要使用 GetCurrentThemeInfo(ThemeResourceType.Colors).themeType，因为此时主题已经更改，所以需要手动获取当前主题。
-        ComboBoxSelectedItem = ThemeControl.ThemeManager.GetCurrentThemeInfo(ThemeResourceType.Colors).themeType;
+        ComboBoxSelectedItem = ThemeControl
+            .ThemeManager.GetCurrentThemeInfo(ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors])
+            .themeType;
         // 在订阅主题更改事件后的每次更改主题时，都会触发此事件修改 ComboBoxSelectedItem 的值。
         ThemeControl.ThemeManager.ThemeChanged += (_, arg) =>
         {
-            if (arg.ResourceType == ThemeResourceType.Colors)
+            if (arg.ResourceType == ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors])
                 ComboBoxSelectedItem = ComboBoxItems.FirstOrDefault(p => p == arg.ThemeType);
         };
     }
@@ -61,7 +62,7 @@ public partial class MainViewModel : ObservableObject
         }
         if (
             ThemeControl.ThemeManager.IsThemeRegistered(
-                ThemeResourceType.Colors,
+                ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors],
                 ComboBoxSelectedItem,
                 NameOfThemesAdded
             )
@@ -73,10 +74,10 @@ public partial class MainViewModel : ObservableObject
         try
         {
             ThemeControl.ThemeService.AddThemeAndSaveToFileSystem(
-                ThemeResourceType.Colors,
+                ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors],
                 ComboBoxSelectedItem,
                 NameOfThemesAdded,
-                ThemeControl.ThemeManager.GetCurrentTheme(ThemeResourceType.Colors)
+                ThemeControl.ThemeManager.GetCurrentTheme(ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors])
             );
             ThemeControl.LoadThemeView();
         }
@@ -93,7 +94,9 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void RemoveTheme(ThemeButtonModel themeButtonModel)
     {
-        (string themeType, string themeName) = ThemeControl.ThemeManager.GetCurrentThemeInfo(ThemeResourceType.Colors);
+        (string themeType, string themeName) = ThemeControl.ThemeManager.GetCurrentThemeInfo(
+            ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors]
+        );
 
         if (themeButtonModel.ThemeType == themeType && themeButtonModel.ThemeName == themeName)
         {
@@ -106,8 +109,10 @@ public partial class MainViewModel : ObservableObject
         }
 
         if (
-            ThemeControl.DefaultThemes[ThemeResourceType.Colors].TryGetValue(themeButtonModel.ThemeType, out string[]? value)
-         && value.Contains(themeButtonModel.ThemeName)
+            ThemeControl
+                .DefaultThemes[ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors]]
+                .TryGetValue(themeButtonModel.ThemeType, out string[]? value)
+            && value.Contains(themeButtonModel.ThemeName)
         )
         {
             TipsText = AddRandomEmoticon(
@@ -121,7 +126,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             ThemeControl.ThemeService.DeleteThemeAndDeleteFileSystemEntry(
-                ThemeResourceType.Colors,
+                ThemeControl.ThemeResourceTypeDic[ThemeResourceType.Colors],
                 themeButtonModel.ThemeType,
                 themeButtonModel.ThemeName
             );

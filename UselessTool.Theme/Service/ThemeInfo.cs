@@ -1,16 +1,6 @@
 namespace UselessTool.Theme.Service;
 
 /// <summary>
-/// 主题资源类型
-/// </summary>
-public enum ThemeResourceType
-{
-    Colors,
-    Styles,
-    Icons,
-}
-
-/// <summary>
 /// 主题信息
 /// </summary>
 /// <param name="themeType">主题类型</param>
