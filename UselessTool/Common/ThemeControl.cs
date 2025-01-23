@@ -315,7 +315,7 @@ public partial class ThemeControl : ObservableObject
             var themeButtons = themes[themeType]
                 .Select(theme =>
                 {
-                    string themeName = theme.Key;
+                    string? themeName = theme.Key;
                     var resourceDict = theme.Value;
 
                     var baseAccentColor =
@@ -380,7 +380,7 @@ public partial class ThemeControl : ObservableObject
     /// </summary>
     public void FollowSystemToggleLightOrDarkTheme()
     {
-        string themeType = App.IsSystemInDarkMode
+        string? themeType = App.IsSystemInDarkMode
             ? ThemeTypeDic[ColorsThemeType.Dark]
             : ThemeTypeDic[ColorsThemeType.Light];
 
@@ -471,7 +471,7 @@ public partial class ThemeControl : ObservableObject
             if (!CurrentColorsThemeResourceDictionary.Contains(key))
                 continue;
 
-            string category = key switch
+            string? category = key switch
             {
                 _ when key.StartsWith("Base.") => "基础颜色",
                 _ when key.StartsWith("Control.") => "控件颜色",
