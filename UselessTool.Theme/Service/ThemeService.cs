@@ -9,23 +9,23 @@ namespace UselessTool.Theme.Service;
 
 public class ThemeService
 {
-    private readonly Dictionary<ThemeResourceType, string> _resourcePaths;
+    private readonly string _themePath;
     private readonly ThemeManager _themeManager;
     private readonly UserPreferences _userPreferences;
-    private readonly Dictionary<ThemeResourceType, Dictionary<string, string[]>> _defaultThemes;
-  
-    public ThemeService(ThemeManager themeManager,Dictionary<ThemeResourceType, Dictionary<string, string[]>> defaultThemes,string themesBasePath)
-    {
-        string baseDirectory = Directory.GetCurrentDirectory();
-        _resourcePaths = [];
-        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
-        {
-            _resourcePaths[resourceType] = Path.Combine(baseDirectory, themesBasePath, resourceType.ToString());
-        }
+    private readonly Dictionary<string, Dictionary<string, string[]>> _defaultThemes;
 
+    public ThemeService(
+        ThemeManager themeManager,
+        Dictionary<string, Dictionary<string, string[]>> defaultThemes,
+        params string[] themesBasePath
+    )
+    {
         _themeManager = themeManager;
         _defaultThemes = defaultThemes;
-        _userPreferences = new UserPreferences(themesBasePath);
+        _userPreferences = new UserPreferences(defaultThemes, themesBasePath);
+
+        string baseDirectory = Directory.GetCurrentDirectory();
+        _themePath = Path.Combine([baseDirectory, .. themesBasePath]);
     }
 
     /// <summary>
@@ -33,19 +33,18 @@ public class ThemeService
     /// </summary>
     public void LoadThemesFromFileSystem()
     {
-        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
+        EnsureDirectoryExists(_themePath);
+        foreach (string resourceTypeDir in Directory.GetDirectories(_themePath)) // 遍历基本路径下的每个子目录（resourceType）
         {
-            string basePath = _resourcePaths[resourceType];
-            EnsureDirectoryExists(basePath);
-            foreach (string themeDir in Directory.GetDirectories(basePath))
+            string resourceType = Path.GetFileName(resourceTypeDir);
+            foreach (string themeTypeDir in Directory.GetDirectories(resourceTypeDir)) // 遍历 resourceType 子目录下的每个次级子目录（themeType）
             {
-                string themeType = Path.GetFileName(themeDir);
-                foreach (string themeFile in Directory.GetFiles(themeDir, "*.xaml"))
+                string themeType = Path.GetFileName(themeTypeDir);
+                foreach (string themeFile in Directory.GetFiles(themeTypeDir, "*.xaml")) // 读取 themeType 次级子目录下的所有 .xaml 文件
                 {
                     string themeName = Path.GetFileNameWithoutExtension(themeFile);
-                    var resourceDict = Load(themeFile);
-
-                    _themeManager.RegisterAndUpdateTheme(resourceType, themeType, themeName, resourceDict);
+                    var resourceDict = Load(themeFile); // 从文件加载资源字典
+                    _themeManager.RegisterAndUpdateTheme(resourceType, themeType, themeName, resourceDict); // 注册主题
                 }
             }
         }
@@ -56,7 +55,7 @@ public class ThemeService
     /// </summary>
     private void LoadThemesFromDefaultThemes()
     {
-        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
+        foreach (string? resourceType in _defaultThemes.Keys)
         {
             if (!_defaultThemes.TryGetValue(resourceType, out var value))
                 continue;
@@ -70,7 +69,7 @@ public class ThemeService
             }
         }
     }
-    
+
     /// <summary>
     /// 判断是否为默认主题。
     /// </summary>
@@ -78,11 +77,11 @@ public class ThemeService
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
     /// <returns>true 是；false 否</returns>
-    public bool IsDefaultTheme(ThemeResourceType themeResourceType, string themeType, string themeName)
+    public bool IsDefaultTheme(string themeResourceType, string themeType, string themeName)
     {
-        return _defaultThemes.TryGetValue(themeResourceType, out var themeTypeList) &&
-            themeTypeList.TryGetValue(themeType, out string[]? themeNames) &&
-            themeNames.Contains(themeName);
+        return _defaultThemes.TryGetValue(themeResourceType, out var themeTypeList)
+            && themeTypeList.TryGetValue(themeType, out string[]? themeNames)
+            && themeNames.Contains(themeName);
     }
 
     /// <summary>
@@ -105,7 +104,7 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
-    public void ReloadThemeFromFileSystem(ThemeResourceType themeResourceType, string themeType, string themeName)
+    public void ReloadThemeFromFileSystem(string themeResourceType, string themeType, string themeName)
     {
         // 从默认主题加载
         if (IsDefaultTheme(themeResourceType, themeType, themeName))
@@ -115,7 +114,7 @@ public class ThemeService
         }
 
         // 从文件系统中加载
-        string themeFilePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
+        string themeFilePath = Path.Combine(_themePath, themeResourceType, themeType, $"{themeName}.xaml");
         if (File.Exists(themeFilePath))
         {
             var resourceDict = Load(themeFilePath);
@@ -130,12 +129,13 @@ public class ThemeService
     /// <summary>
     /// 应用指定类别用户偏好的主题
     /// </summary>
-    public void ApplyPreferredTheme(ThemeResourceType themeResourceType)
+    public void ApplyPreferredTheme(string themeResourceType)
     {
         var preferences = _userPreferences.LoadUserPreferences();
         if (
-            preferences[themeResourceType].TryGetValue("PreferenceThemeType", out string? currentThemeType)
-            && preferences[themeResourceType].TryGetValue(currentThemeType, out string? preferredThemeName)
+            preferences.TryGetValue(themeResourceType, out Dictionary<string, string>? dic)
+            && dic.TryGetValue("PreferenceThemeType", out string? currentThemeType)
+            && dic.TryGetValue(currentThemeType, out string? preferredThemeName)
             && _themeManager.IsThemeRegistered(themeResourceType, currentThemeType, preferredThemeName)
         )
         {
@@ -143,7 +143,8 @@ public class ThemeService
         }
         else
         {
-            if (!_defaultThemes.TryGetValue(themeResourceType, out var value)) return;
+            if (!_defaultThemes.TryGetValue(themeResourceType, out var value))
+                return;
             var defaultTheme = value.FirstOrDefault();
             _themeManager.ApplyTheme(themeResourceType, defaultTheme.Key, defaultTheme.Value[0]);
         }
@@ -154,7 +155,7 @@ public class ThemeService
     /// </summary>
     private void ApplyAllPreferredThemes()
     {
-        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
+        foreach (string? resourceType in _themeManager.ThemeResources.Keys)
         {
             ApplyPreferredTheme(resourceType);
         }
@@ -163,7 +164,7 @@ public class ThemeService
     /// <summary>
     /// 保存当前应用的主题为用户偏好
     /// </summary>
-    private void SaveCurrentThemeAsPreference(ThemeResourceType themeResourceType)
+    private void SaveCurrentThemeAsPreference(string themeResourceType)
     {
         try
         {
@@ -182,7 +183,7 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
-    private void SaveThemeAsPreference(ThemeResourceType themeResourceType, string themeType, string themeName)
+    private void SaveThemeAsPreference(string themeResourceType, string themeType, string themeName)
     {
         var preferences = _userPreferences.LoadUserPreferences();
         preferences[themeResourceType][themeType] = themeName;
@@ -194,9 +195,12 @@ public class ThemeService
     /// 获取指定主题资源类型的偏好设置
     /// </summary>
     /// <returns>用户偏好设置字典</returns>
-    public Dictionary<string, string> GetUserPreferences(ThemeResourceType themeResourceType)
+    public Dictionary<string, string> GetUserPreferences(string themeResourceType)
     {
-        return _userPreferences.LoadUserPreferences()[themeResourceType];
+        var preferences = _userPreferences.LoadUserPreferences();
+        return preferences.TryGetValue(themeResourceType, out Dictionary<string, string>? value)
+            ? value
+            : throw new KeyNotFoundException($"用户偏好配置文件中不存在 '{themeResourceType}' 项目！");
     }
 
     /// <summary>
@@ -207,7 +211,7 @@ public class ThemeService
     /// <param name="themeName">主题名称</param>
     /// <param name="isChangePreference">是否更改偏好（默认true）</param>
     public void TryApplyTheme(
-        ThemeResourceType themeResourceType,
+        string themeResourceType,
         string themeType,
         string themeName,
         bool isChangePreference = true
@@ -231,11 +235,7 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型。</param>
     /// <param name="themeType">主题类型。</param>
     /// <param name="isChangePreference">是否更改偏好（默认true）</param>
-    public void SwitchToPreferredTheme(
-        ThemeResourceType themeResourceType,
-        string themeType,
-        bool isChangePreference = true
-    )
+    public void SwitchToPreferredTheme(string themeResourceType, string themeType, bool isChangePreference = true)
     {
         string? preferredThemeName = GetPreferredThemeName(themeResourceType, themeType);
         if (preferredThemeName is null)
@@ -250,12 +250,10 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型。</param>
     /// <param name="themeType">主题类型。</param>
     /// <returns>首选主题名称，如果不存在则返回 null。</returns>
-    private string? GetPreferredThemeName(ThemeResourceType themeResourceType, string themeType)
+    private string? GetPreferredThemeName(string themeResourceType, string themeType)
     {
         if (
-            !_themeManager
-                .ThemeResources[themeResourceType]
-                .TryGetValue(themeType, out var themeList)
+            !_themeManager.ThemeResources[themeResourceType].TryGetValue(themeType, out var themeList)
             || themeList.Count == 0
         )
             return null;
@@ -272,13 +270,13 @@ public class ThemeService
     /// <param name="themeName">主题名称</param>
     /// <param name="resourceDict">新的资源字典</param>
     public void AddThemeAndSaveToFileSystem(
-        ThemeResourceType themeResourceType,
+        string themeResourceType,
         string themeType,
         string themeName,
         ResourceDictionary resourceDict
     )
     {
-        string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
+        string filePath = Path.Combine(_themePath, themeResourceType, themeType, $"{themeName}.xaml");
         EnsureDirectoryExists(Path.GetDirectoryName(filePath)!);
         Save(resourceDict, filePath);
         _themeManager.RegisterAndUpdateTheme(themeResourceType, themeType, themeName, resourceDict);
@@ -290,11 +288,7 @@ public class ThemeService
     /// <param name="themeResourceType">资源类型</param>
     /// <param name="themeType">主题类型（例如：亮色主题、暗色主题）</param>
     /// <param name="themeName">主题名称</param>
-    public void DeleteThemeAndDeleteFileSystemEntry(
-        ThemeResourceType themeResourceType,
-        string themeType,
-        string themeName
-    )
+    public void DeleteThemeAndDeleteFileSystemEntry(string themeResourceType, string themeType, string themeName)
     {
         if (GetPreferredThemeName(themeResourceType, themeType) == themeName)
         {
@@ -305,7 +299,7 @@ public class ThemeService
             );
         }
 
-        string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
+        string filePath = Path.Combine(_themePath, themeResourceType, themeType, $"{themeName}.xaml");
         if (File.Exists(filePath))
             File.Delete(filePath);
 
@@ -320,7 +314,7 @@ public class ThemeService
     /// <param name="themeName">主题名称</param>
     /// <param name="newResourceDict">新的资源字典</param>
     public void UpdateThemeAndSaveToFileSystem(
-        ThemeResourceType themeResourceType,
+        string themeResourceType,
         string themeType,
         string themeName,
         ResourceDictionary? newResourceDict = null
@@ -331,8 +325,8 @@ public class ThemeService
         {
             throw new InvalidOperationException("默认主题不可以修改！");
         }
-        
-        string filePath = Path.Combine(_resourcePaths[themeResourceType], themeType, $"{themeName}.xaml");
+
+        string filePath = Path.Combine(_themePath, themeResourceType, themeType, $"{themeName}.xaml");
         EnsureFileExists(filePath);
         newResourceDict ??= _themeManager.GetThemeResourceDictionary(themeResourceType, themeType, themeName);
         Save(newResourceDict, filePath);
@@ -348,7 +342,7 @@ public class ThemeService
     /// <param name="newThemeType">新主题类型</param>
     /// <param name="newThemeName">新主题名称</param>
     public void RenameThemeAndSaveToFileSystem(
-        ThemeResourceType themeResourceType,
+        string themeResourceType,
         string oldThemeType,
         string oldThemeName,
         string newThemeType,
@@ -384,7 +378,7 @@ public class ThemeService
     /// <param name="newThemeName">新主题名称</param>
     /// <returns>返回最终的主题类型和名称</returns>
     private (string finalThemeType, string finalThemeName) ValidateAndPrepareRename(
-        ThemeResourceType themeResourceType,
+        string themeResourceType,
         string oldThemeType,
         string oldThemeName,
         string newThemeType,
@@ -424,15 +418,15 @@ public class ThemeService
     /// <param name="newThemeType">新主题类型</param>
     /// <param name="newThemeName">新主题名称</param>
     private void MoveThemeFileOnDisk(
-        ThemeResourceType themeResourceType,
+        string themeResourceType,
         string oldThemeType,
         string oldThemeName,
         string newThemeType,
         string newThemeName
     )
     {
-        string oldFilePath = Path.Combine(_resourcePaths[themeResourceType], oldThemeType, $"{oldThemeName}.xaml");
-        string newFilePath = Path.Combine(_resourcePaths[themeResourceType], newThemeType, $"{newThemeName}.xaml");
+        string oldFilePath = Path.Combine(_themePath, themeResourceType, oldThemeType, $"{oldThemeName}.xaml");
+        string newFilePath = Path.Combine(_themePath, themeResourceType, newThemeType, $"{newThemeName}.xaml");
 
         if (oldFilePath == newFilePath)
             return;

@@ -5,27 +5,18 @@ namespace UselessTool.Theme.Service;
 public class ThemeManager
 {
     internal Dictionary<
-        ThemeResourceType,
+        string,
         Dictionary<string, Dictionary<string, ResourceDictionary>>
     > ThemeResources
     { get; } = [];
 
-    private Dictionary<ThemeResourceType, ThemeInfo> CurrentThemesInfo { get; } = [];
+    private Dictionary<string, ThemeInfo> CurrentThemesInfo { get; } = [];
 
     public event EventHandler<ThemeChangingEventArgs>? ThemeChanging; // 定义主题更改前事件
     public event EventHandler<ThemeChangedEventArgs>? ThemeChanged; // 定义主题更改后事件
 
     public string? AssemblyName { get; init; }
     public string? ResourceBasedPath { get; init; }
-
-    public ThemeManager()
-    {
-        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
-        {
-            ThemeResources[resourceType] = [];
-            CurrentThemesInfo[resourceType] = new ThemeInfo();
-        }
-    }
 
     /// <summary>
     /// 注册并更新一个新主题
@@ -35,7 +26,7 @@ public class ThemeManager
     /// <param name="themeName">主题名称</param>
     /// <param name="resourceDict">资源字典</param>
     public void RegisterAndUpdateTheme(
-        ThemeResourceType resourceType,
+        string resourceType,
         string themeType,
         string themeName,
         ResourceDictionary resourceDict
@@ -65,7 +56,7 @@ public class ThemeManager
     /// <param name="assemblyName">程序集，默认为当前程序集</param>
     /// <param name="resourcePath">程序集中的资源字典所在路径（相对路径）</param>
     public void RegisterAndUpdateTheme(
-        ThemeResourceType resourceType,
+        string resourceType,
         string themeType,
         string themeName,
         string? assemblyName = null,
@@ -94,7 +85,7 @@ public class ThemeManager
     /// <param name="resourceType">资源类型</param>
     /// <param name="themeType">主题类型（例如：亮色主题、暗色主题）</param>
     /// <param name="themeName">主题名称</param>
-    internal void ApplyTheme(ThemeResourceType resourceType, string themeType, string themeName)
+    internal void ApplyTheme(string resourceType, string themeType, string themeName)
     {
         var newTheme = GetThemeResourceDictionary(resourceType, themeType, themeName);
 
@@ -121,7 +112,7 @@ public class ThemeManager
     /// <param name="resourceType">资源类型</param>
     /// <param name="themeType">主题类型（例如：亮色主题、暗色主题）</param>
     /// <param name="themeName">主题名称</param>
-    internal void RemoveTheme(ThemeResourceType resourceType, string themeType, string themeName)
+    internal void RemoveTheme(string resourceType, string themeType, string themeName)
     {
         if (string.IsNullOrEmpty(themeType) || string.IsNullOrEmpty(themeName))
             return;
@@ -140,7 +131,7 @@ public class ThemeManager
     /// <param name="newThemeType">新主题类型</param>
     /// <param name="newThemeName">新主题名称</param>
     internal void RenameTheme(
-        ThemeResourceType resourceType,
+        string resourceType,
         string oldThemeType,
         string oldThemeName,
         string newThemeType,
@@ -166,7 +157,7 @@ public class ThemeManager
     /// </summary>
     /// <param name="resourceType">资源类型</param>
     /// <returns>包含主题类型和主题名称的元组</returns>
-    public (string themeType, string themeName) GetCurrentThemeInfo(ThemeResourceType resourceType)
+    public (string themeType, string themeName) GetCurrentThemeInfo(string resourceType)
     {
         return (CurrentThemesInfo[resourceType].ThemeType, CurrentThemesInfo[resourceType].ThemeName);
     }
@@ -176,7 +167,7 @@ public class ThemeManager
     /// </summary>
     /// <param name="resourceType">资源类型</param>
     /// <returns>资源字典</returns>
-    public ResourceDictionary GetCurrentTheme(ThemeResourceType resourceType)
+    public ResourceDictionary GetCurrentTheme(string resourceType)
     {
         return GetThemeResourceDictionary(
             resourceType,
@@ -191,7 +182,7 @@ public class ThemeManager
     /// <param name="resourceType">资源类型</param>
     /// <returns>主题字典 结构：主题类型>主题名>资源字典</returns>
     public Dictionary<string, Dictionary<string, ResourceDictionary>> GetThemeResourceTypeDictionary(
-        ThemeResourceType resourceType
+        string resourceType
     )
     {
         // 创建副本，避免在程序集外被修改。
@@ -206,7 +197,7 @@ public class ThemeManager
     /// <param name="themeName">主题名称</param>
     /// <returns>资源字典</returns>
     public ResourceDictionary GetThemeResourceDictionary(
-        ThemeResourceType resourceType,
+        string resourceType,
         string themeType,
         string themeName
     )
@@ -226,7 +217,7 @@ public class ThemeManager
     /// <param name="themeType">主题类型</param>
     /// <returns>键值对：（主题名，对应资源字典）</returns>
     public KeyValuePair<string, ResourceDictionary> GetFirstThemeKeyValuePair(
-        ThemeResourceType resourceType,
+        string resourceType,
         string themeType
     )
     {
@@ -241,7 +232,7 @@ public class ThemeManager
     /// <param name="resourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
     /// <returns>键值对：（主题名，对应资源字典）</returns>
-    public string GetFirstThemeName(ThemeResourceType resourceType, string themeType)
+    public string GetFirstThemeName(string resourceType, string themeType)
     {
         return GetFirstThemeKeyValuePair(resourceType, themeType).Key;
     }
@@ -253,7 +244,7 @@ public class ThemeManager
     /// <param name="themeType">主题类型</param>
     /// <param name="themeName">主题名称</param>
     /// <returns></returns>
-    public bool IsThemeRegistered(ThemeResourceType resourceType, string themeType, string themeName)
+    public bool IsThemeRegistered(string resourceType, string themeType, string themeName)
     {
         return ThemeResources.TryGetValue(resourceType, out var themesByType)
             && themesByType.TryGetValue(themeType, out var themes)
@@ -264,7 +255,7 @@ public class ThemeManager
     /// 确保资源类型存在。 如果不存在，则创建一个空的主题类型集合
     /// </summary>
     /// <param name="resourceType">资源类型</param>
-    private void EnsureResourceTypeExists(ThemeResourceType resourceType)
+    private void EnsureResourceTypeExists(string resourceType)
     {
         if (!ThemeResources.ContainsKey(resourceType))
         {
@@ -277,7 +268,7 @@ public class ThemeManager
     /// </summary>
     /// <param name="resourceType">资源类型</param>
     /// <param name="themeType">主题类型</param>
-    internal void EnsureThemeTypeExists(ThemeResourceType resourceType, string themeType)
+    internal void EnsureThemeTypeExists(string resourceType, string themeType)
     {
         EnsureResourceTypeExists(resourceType);
         if (!ThemeResources[resourceType].ContainsKey(themeType))
@@ -306,7 +297,7 @@ public class ThemeManager
     /// </summary>
     internal void ClearCurrentThemesInfo()
     {
-        foreach (var resourceType in CurrentThemesInfo.Keys.ToList())
+        foreach (string resourceType in CurrentThemesInfo.Keys.ToList())
         {
             CurrentThemesInfo[resourceType] = new ThemeInfo();
         }
@@ -335,13 +326,13 @@ public class ThemeManager
 /// 自定义主题更改前事件参数类
 /// </summary>
 public class ThemeChangingEventArgs(
-    ThemeResourceType resourceType,
+    string resourceType,
     string themeType,
     string themeName,
     ResourceDictionary theme
 ) : EventArgs
 {
-    public ThemeResourceType ResourceType { get; } = resourceType;
+    public string ResourceType { get; } = resourceType;
     public string ThemeType { get; } = themeType;
     public string ThemeName { get; } = themeName;
     public ResourceDictionary OldTheme { get; } = theme;
@@ -352,13 +343,13 @@ public class ThemeChangingEventArgs(
 /// 自定义主题更改后事件参数类
 /// </summary>
 public class ThemeChangedEventArgs(
-    ThemeResourceType resourceType,
+    string resourceType,
     string themeType,
     string themeName,
     ResourceDictionary theme
 ) : EventArgs
 {
-    public ThemeResourceType ResourceType { get; } = resourceType;
+    public string ResourceType { get; } = resourceType;
     public string ThemeType { get; } = themeType;
     public string ThemeName { get; } = themeName;
     public ResourceDictionary NewTheme { get; } = theme;

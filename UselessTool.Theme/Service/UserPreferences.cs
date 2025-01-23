@@ -3,23 +3,21 @@ using UselessTool.Bases.FileOperation;
 
 namespace UselessTool.Theme.Service;
 
-public class UserPreferences(string filePath)
+public class UserPreferences(Dictionary<string, Dictionary<string, string[]>> defaultThemes, params string[] filePath)
 {
-    private readonly JsonConfig<Dictionary<ThemeResourceType, Dictionary<string, string>>> _jsonConfig = new(
-        filePath,
-        "userPreferences.json"
+    private readonly JsonConfig<Dictionary<string, Dictionary<string, string>>> _jsonConfig = new(
+        [.. filePath, "userPreferences.json"]
     );
 
     /// <summary>
     /// 加载用户偏好设置
     /// </summary>
     /// <returns>用户偏好设置字典</returns>
-    public Dictionary<ThemeResourceType, Dictionary<string, string>> LoadUserPreferences()
+    public Dictionary<string, Dictionary<string, string>> LoadUserPreferences()
     {
         try
         {
-            var preferences = _jsonConfig.LoadFromJson();
-            return preferences ?? CreateDefaultPreferences();
+            return _jsonConfig.LoadFromJson() ?? CreateDefaultPreferences();
         }
         catch (Exception)
         {
@@ -31,7 +29,7 @@ public class UserPreferences(string filePath)
     /// 保存用户偏好设置
     /// </summary>
     /// <param name="preferences">用户偏好设置字典</param>
-    public void SaveUserPreferences(Dictionary<ThemeResourceType, Dictionary<string, string>> preferences)
+    public void SaveUserPreferences(Dictionary<string, Dictionary<string, string>> preferences)
     {
         try
         {
@@ -48,13 +46,12 @@ public class UserPreferences(string filePath)
     /// 创建默认的用户偏好设置字典
     /// </summary>
     /// <returns>默认的用户偏好设置字典</returns>
-    private static Dictionary<ThemeResourceType, Dictionary<string, string>> CreateDefaultPreferences()
+    private Dictionary<string, Dictionary<string, string>> CreateDefaultPreferences()
     {
-        Dictionary<ThemeResourceType, Dictionary<string, string>> preferences = [];
-        foreach (var resourceType in Enum.GetValues<ThemeResourceType>())
-        {
-            preferences[resourceType] = [];
-        }
-        return preferences;
+        return defaultThemes.ToDictionary(
+            resourceType => resourceType.Key,
+            resourceType =>
+                resourceType.Value.Where(kv => kv.Value.Length > 0).ToDictionary(kv => kv.Key, kv => kv.Value.First())
+        );
     }
 }
